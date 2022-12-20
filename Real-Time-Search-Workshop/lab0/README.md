@@ -44,6 +44,29 @@ Visit [https://redis.com/try-free/](https://redis.com/try-free/) and sign-up for
 
 ![alt_text](images/image10.png "image_tooltip")
 
-##### 11. Download and install RedisInsight Desktop on your laptop
+##### 11. Download RedisInsight Desktop on your laptop
 
 ![alt_text](images/image11.png "image_tooltip")
+
+##### 12. Install RedisInsight Desktop
+
+![alt_text](images/image12.png "image_tooltip")
+
+ 13. Open RedisInsight Desktop and add a new database
+
+![alt_text](images/image13.png "image_tooltip")
+
+14. Copy the URI details of your new database and paste it in RedisInsight
+
+![alt_text](images/image14.png "image_tooltip")
+
+![alt_text](images/image15.png "image_tooltip")
+
+15. Your Redis database has been added and is ready to be used
+
+![alt_text](images/image16.png "image_tooltip")
+
+15. Your environment is now ready for the labs in this workshop
+
+![alt_text](images/image17.png "image_tooltip")
+
