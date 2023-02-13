@@ -1,3 +1,5 @@
+<!-- Redis Cloud Version - no A-A Redis Search available yet -->
+
 **Real Time Search Workshop**
 
 Lab 6 - Deploying a Five 9's Redis Environment
@@ -27,5 +29,3 @@ Lab 6 - Deploying a Five 9's Redis Environment
 ##### 5. Review the details of your new subscription and active-active database and create it
 
 ![alt_text](images/image5.png "image_tooltip")
-
-
