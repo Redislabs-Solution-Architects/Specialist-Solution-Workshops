@@ -12,9 +12,8 @@ Lab 6 - Deploying a 99.999 Redis Environment
 
 ##### 3. Give your database a name following the pattern &lt;last-name>-crdb
 
-* Set the memory limit to 0.1 GB
 * Add the RedisJSON and the RediSearch 2 module 
-* Add the participating clusters and leave 0.1GB of memory 
+* Add the participating clusters and leave 0.1 GB of memory limit 
 
 ![alt_text](images/image2.png "image_tooltip")
 
