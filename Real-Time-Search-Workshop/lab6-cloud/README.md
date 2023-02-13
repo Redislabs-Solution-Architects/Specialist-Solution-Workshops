@@ -2,7 +2,7 @@
 
 **Real Time Search Workshop**
 
-Lab 6 - Deploying a Five 9's Redis Environment
+Lab 6 - Deploying a 99.999 Redis Environment
 
 ##### 1. Login to your Redis Cloud account and create a new Flexible plan subscription
 
