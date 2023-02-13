@@ -57,7 +57,7 @@ JSON.SET ex1:2 $ '{"field1": "val1"}'
 ```
 
 ### Multiple Properties <a name="multiple_properties"></a>
-Insert a JSON object will multiple properties.
+Insert a JSON object with multiple properties.
 #### Command
 ```bash
 JSON.SET ex1:3 $ '{"field1": "val1", "field2": "val2"}'
@@ -217,7 +217,7 @@ JSON.GET ex3:1
 ```
 
 ### Single Property <a name="single_update"></a>
-Update a single property within in an object.
+Update a single property within an object.
 #### Command
 ```bash
 JSON.SET ex3:2 $ '{"field1": "val1", "field2": "val2"}'
