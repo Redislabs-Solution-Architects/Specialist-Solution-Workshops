@@ -67,7 +67,7 @@ JSON.SET product:59263 $ '{"id": 59263, "gender": "Women", "season":["Fall", "Wi
 
 ![alt_text](images/image11.png "image_tooltip")
 
-##### 12. Search for the "winter" tag on both CRDB regions and verify that you get two results from both regions
+##### 12. Search for the "Winter" season tag on both CRDB regions and verify that you get two results on both regions
 
 ```bash
 FT.SEARCH idx1 '@season:{Winter}'
