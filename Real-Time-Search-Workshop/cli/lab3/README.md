@@ -65,8 +65,8 @@ JSON.SET product:59263 $ '{"id": 59263, "gender": "Women", "season":["Fall", "Wi
 JSON.SET product:46885 $ '{"id": 46885, "gender": "Boys", "season":["Fall"], "description": "Ben 10 Boys Navy Blue Slippers", "price": 45.99, "city": "Denver", "coords": "-104.991531, 39.742043"}'
 ```
 ## Index Creation <a name="index_creation"></a>
-### Syntax (abbreviated)
-``` FT.CREATE <name> ON JSON PREFIX <count> <prefix> SCHEMA <fieldName> AS <alias> TEXT | TAG | NUMERIC | GEO | VECTOR ```
+### Syntax
+[FT.CREATE](https://redis.io/commands/ft.create/)
 #### Command
 ```bash
 FT.CREATE idx1 ON JSON PREFIX 1 product: SCHEMA $.id as id NUMERIC $.gender as gender TAG $.season.* AS season TAG $.description AS description TEXT $.price AS price NUMERIC $.city AS city TEXT $.coords AS coords GEO
@@ -77,8 +77,8 @@ FT.CREATE idx1 ON JSON PREFIX 1 product: SCHEMA $.id as id NUMERIC $.gender as g
 ```
 
 ## Search Examples <a name="search_examples"></a>
-### Syntax (abbreviated)
-```FT.SEARCH <index> <query>```
+### Syntax
+[FT.SEARCH](https://redis.io/commands/ft.search/)
 ### Retrieve All <a name="retrieve_all"></a>
 Find all documents for a given index.
 #### Command

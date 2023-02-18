@@ -54,7 +54,7 @@ JSON.SET warehouse:1 $ '{"city": "Boston","location": "42.361145, -71.057083","i
 ```
 ## Array Filtering Examples <a name="arrayfiltering"></a>
 ### Syntax
-```JSON.GET <key> <path w/filter>```
+[JSON.GET](https://redis.io/commands/json.get/)
 ### All Properties of Array <a name="allprops"></a>
 Fetch all properties of an array.
 #### Command
