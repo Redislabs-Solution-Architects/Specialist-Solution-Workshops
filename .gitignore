@@ -1,4 +1,7 @@
 .DS_Store
 node_modules/
 package*.json
-.env*
+.env
+.venv/
+redis.ini
+__pycache__
