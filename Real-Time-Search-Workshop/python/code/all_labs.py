@@ -11,7 +11,7 @@ from lab6 import Lab6
 
 lab1 = Lab1()
 client = lab1.run()
-'''
+
 lab2 = Lab2()
 lab2.run(client)
 
@@ -23,6 +23,6 @@ lab4.run(client)
 
 lab5 = Lab5()
 lab5.run(client)
-'''
+
 lab6 = Lab6()
 lab6.run(client)

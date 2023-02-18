@@ -9,7 +9,6 @@ from redis.commands.search.query import Query
 class Lab6(object):
 
     def run(self, client):
-
         print('\n*** Lab 6 - Index Creation ***')
         try: 
             client.ft('idx1').dropindex()
