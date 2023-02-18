@@ -33,7 +33,7 @@ Document stores are a NoSQL database type that provide flexible schemas and acce
 
 ## Create <a name="create"></a>
 ### Syntax
-`JSON.SET <KEY> <PATH> <OBJECT>`
+[JSON.SET](https://redis.io/commands/json.set/)
 ### Key Value Pair <a name="kvp"></a>
 Insert a simple KVP as a JSON object.
 #### Command
@@ -113,7 +113,7 @@ JSON.SET ex1:7 $ '{"str1": "val1", "str2": "val2", "arr1":[1,2,3,4], "obj1": {"n
 
 ## Read <a name="read"></a>
 ### Syntax
-`JSON.GET <KEY> <PATH>`
+[JSON.GET](https://redis.io/commands/json.get/)
 ### Key Fetch <a name="key_fetch"></a>
 Set and Fetch a simple JSON KVP.
 #### Command
@@ -198,7 +198,7 @@ JSON.GET ex2:5 $.arr1[-2:]
 
 ## Update <a name="update"></a>
 ### Syntax
-`JSON.SET <KEY> <PATH> <OBJECT>`
+[JSON.SET](https://redis.io/commands/json.set/)
 ### Entire Object <a name="entire_update"></a>
 Update an entire JSON object.
 #### Command
@@ -269,7 +269,7 @@ JSON.GET ex3:4
 
 ## Delete <a name="delete"></a>
 ### Syntax
-`JSON.DEL <KEY> <PATH>`
+[JSON.DEL](https://redis.io/commands/json.del/)
 ### Entire Object <a name="entire_delete"></a>
 Delete entire object/key.
 #### Command
