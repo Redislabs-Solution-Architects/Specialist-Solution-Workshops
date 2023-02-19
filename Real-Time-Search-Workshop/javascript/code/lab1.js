@@ -3,7 +3,7 @@
  * @maker Joey Whelan
  */
 
-import { createClient, SchemaFieldTypes, VectorAlgorithms, AggregateSteps, AggregateGroupByReducers } from 'redis';
+import { createClient } from 'redis';
 import * as dotenv from 'dotenv';
 dotenv.config();
 

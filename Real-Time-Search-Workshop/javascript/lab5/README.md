@@ -2,7 +2,8 @@
 Aggregation and other more complex RediSearch queries
 ## Contents
 1.  [Business Value Statement](#value)
-2.  [Vector Similarity Search](#vss)
+2.  [Modules Needed](#modules)
+3.  [Vector Similarity Search](#vss)
     1.  [Data Set](#vss_dataset)
     2.  [Data Load](#vss_dataload)
     3.  [Index Creation](#vss_index)
@@ -13,7 +14,7 @@ Aggregation and other more complex RediSearch queries
     3.  [Index Creation](#advs_index)
     4.  [Search w/JSON Filtering - Example 1](#advs_ex1)
     5.  [Search w/JSON Filtering - Example 2](#advs_ex2)
-4.  [Aggregation](#aggr)
+5.  [Aggregation](#aggr)
     1.  [Data Set](#aggr_dataset)
     2.  [Data Load](#aggr_dataload)
     3.  [Index Creation](#aggr_index)
@@ -26,23 +27,25 @@ Redis provides the following additional advanced search capabilities to derive f
 * Search + JSON Filtering - Combine the power of search with JSONPath filtering of search results
 * Aggregation - Create processing pipelines of search results to extract analytic insights.
 
-## Vector Similarity Search (VSS) <a name="vss"></a>
-The VSS exercises must be done against a Redis Stack env.
-### Data Set <a name="vss_dataset"></a>
-- Image 16185: Enroute Men Leather Black Formal Shoes  
-![shoes](16185.jpg)
-- Image 4790: ADIDAS Sky Ball Brown T-shirt  
-![shirt](4790.jpg)
-- Image 25628: Fastrack Women Charcoal Grey Dial Watch  
-![watch](25628.jpg)
-### Data Load <a name="vss_dataload"></a>
+## Modules Needed <a name="modules"></a>
 ```javascript
-import { SchemaFieldTypes, VectorAlgorithms } from 'redis';
+import { SchemaFieldTypes, VectorAlgorithms, AggregateSteps, AggregateGroupByReducers } from 'redis';
 import * as mobilenet from '@tensorflow-models/mobilenet';
 import * as tfnode from '@tensorflow/tfjs-node';
 import fsPromises from 'node:fs/promises';
 import * as path  from 'path';
+```
+## Vector Similarity Search (VSS) <a name="vss"></a>
 
+### Data Set <a name="vss_dataset"></a>
+- Image 16185: Enroute Men Leather Black Formal Shoes  
+![shoes](./images/16185.jpg)
+- Image 4790: ADIDAS Sky Ball Brown T-shirt  
+![shirt](./images/4790.jpg)
+- Image 25628: Fastrack Women Charcoal Grey Dial Watch  
+![watch](./images/25628.jpg)
+### Data Load <a name="vss_dataload"></a>
+```javascript
 async function vectorize(fileName) {
     const image =  await fsPromises.readFile(path.join(process.env.PWD, `lab5/${fileName}`));
     const decodedImage = tfnode.node.decodeImage(image, 3);
@@ -86,7 +89,7 @@ OK
 ### Search <a name="vss_search">
 #### Query Item
 - Image 35460: Doodle Boys Printed Green T-shirt  
-![shirt](35460.jpg)
+![shirt](./images/35460.jpg)
 #### Command
 ```javascript
     let vec = await vectorize('35460.jpg');
@@ -188,96 +191,70 @@ OK
 
 ### Data Load  <a name="advs_dataload">
 ```javascript
-    await client.json.set('warehouse:1', '$', {
-        "city": "Boston",
-        "location": "-71.057083, 42.361145",
-        "inventory":[
-            {
-                "id": 15970,
-                "gender": "Men",
-                "season":["Fall", "Winter"],
-                "description": "Turtle Check Men Navy Blue Shirt",
-                "price": 34.95
-            },
-            {
-                "id": 59263,
-                "gender": "Women",
-                "season": ["Fall", "Winter", "Spring", "Summer"],
-                "description": "Titan Women Silver Watch",
-                "price": 129.99
-            },
-            {
-                "id": 46885,
-                "gender": "Boys",
-                "season": ["Fall"],
-                "description": "Ben 10 Boys Navy Blue Slippers",
-                "price": 45.99
-            }
-        ]
-    });
-    await client.json.set('warehouse:1', '$', {
-        "city": "Dallas",
-        "location": "-96.808891, 32.779167",
-        "inventory": [
-            {
-                "id": 51919,
-                "gender": "Women",
-                "season":["Summer"],
-                "description": "Nyk Black Horado Handbag",
-                "price": 52.49
-            },
-            {
-                "id": 4602,
-                "gender": "Unisex",
-                "season": ["Fall", "Winter"],
-                "description": "Wildcraft Red Trailblazer Backpack",
-                "price": 50.99
-            },
-            {
-                "id": 37561,
-                "gender": "Girls",
-                "season": ["Spring", "Summer"],
-                "description": "Madagascar3 Infant Pink Snapsuit Romper",
-                "price": 23.95
-            }
-        ]
-    });
+await client.json.set('warehouse:1', '$', {
+    "city": "Boston",
+    "location": "-71.057083, 42.361145",
+    "inventory":[
+    {
+        "id": 15970,
+        "gender": "Men",
+        "season":["Fall", "Winter"],
+        "description": "Turtle Check Men Navy Blue Shirt",
+        "price": 34.95
+    },
+    {
+        "id": 59263,
+        "gender": "Women",
+        "season": ["Fall", "Winter", "Spring", "Summer"],
+        "description": "Titan Women Silver Watch",
+        "price": 129.99
+    },
+    {
+        "id": 46885,
+        "gender": "Boys",
+        "season": ["Fall"],
+        "description": "Ben 10 Boys Navy Blue Slippers",
+        "price": 45.99
+    }
+]});
+await client.json.set('warehouse:2', '$', {
+    "city": "Dallas",
+    "location": "-96.808891, 32.779167",
+    "inventory": [
+    {
+        "id": 51919,
+        "gender": "Women",
+        "season":["Summer"],
+        "description": "Nyk Black Horado Handbag",
+        "price": 52.49
+    },
+    {
+        "id": 4602,
+        "gender": "Unisex",
+        "season": ["Fall", "Winter"],
+        "description": "Wildcraft Red Trailblazer Backpack",
+        "price": 50.99
+    },
+    {
+        "id": 37561,
+        "gender": "Girls",
+        "season": ["Spring", "Summer"],
+        "description": "Madagascar3 Infant Pink Snapsuit Romper",
+        "price": 23.95
+    }
+]});
 ```
 
 ### Index Creation <a name="advs_index">
 #### Command
 ```javascript
-    let result = await client.ft.create('wh_idx', {
-        '$.city': {
-            type: SchemaFieldTypes.TEXT,
-            AS: 'city'
-        },
-        '$.location': {
-            type: SchemaFieldTypes.GEO,
-            AS: 'location'
-        }, 
-        '$.inventory[*].id': {
-            type: SchemaFieldTypes.NUMERIC,
-            AS: 'id'
-        },
-        '$.inventory[*].gender': {
-            type: SchemaFieldTypes.TAG,
-            AS: 'gender'
-        },
-        '$.inventory[*].season.*': {
-            type: SchemaFieldTypes.TAG,
-            AS: 'season'
-        },
-        '$.inventory[*].description': {
-            type: SchemaFieldTypes.TEXT,
-            AS: 'description'
-        },
-        '$.inventory[*].price': {
-            type: SchemaFieldTypes.NUMERIC,
-            AS: 'price'
-        }
-     }, { ON: 'JSON', PREFIX: 'warehouse:'});
-    console.log(result);
+result = await client.ft.create('wh_idx', {
+    '$.city': {
+        type: SchemaFieldTypes.TEXT,
+        AS: 'city'
+    }
+}, { ON: 'JSON', PREFIX: 'warehouse:'});
+console.log(result);
 ```
 #### Result
 ```bash
@@ -285,25 +262,20 @@ OK
 ```
 
 ### Search w/JSON Filtering - Example 1 <a name="advs_ex1">
-Find all inventory ids from all warehouses that have a season value of Fall and Price > $50.
+Find all inventory ids from all the Boston warehouse that have a price > $50.
 #### Command
 ```javascript
-    result = await client.ft.search('wh_idx', '@season:{Fall}', {
-        RETURN: ['$.inventory[?(@.price>50)].id'],
-        DIALECT: 3
-    });
+result = await client.ft.search('wh_idx', '@city:Boston', {
+    RETURN: ['$.inventory[?(@.price>50)].id'],
+    DIALECT: 3
+});
+console.log(JSON.stringify(result, null, 4));
 ```
 #### Result
 ```json
 {
-    "total": 2,
+    "total": 1,
     "documents": [
-        {
-            "id": "warehouse:2",
-            "value": {
-                "$.inventory[?(@.price>50)].id": "[51919,4602]"
-            }
-        },
         {
             "id": "warehouse:1",
             "value": {

@@ -2,10 +2,11 @@
 Examples of simple search operations with RediSearch 
 ## Contents
 1.  [Business Value Statement](#value)
-2.  [Data Set](#dataset)
-3.  [Data Loading](#loading)
-4.  [Index Creation](#index_creation)
-5.  [Search Examples](#search_examples)
+2.  [Modules Needed](#modules)
+3.  [Data Set](#dataset)
+4.  [Data Loading](#loading)
+5.  [Index Creation](#index_creation)
+6.  [Search Examples](#search_examples)
     1.  [Retrieve All](#retrieve_all)
     2.  [Single Term Text](#single_term)
     3.  [Exact Phrase Text](#exact_phrase)
@@ -21,6 +22,10 @@ Examples of simple search operations with RediSearch
 
 ## Business Value Statement <a name="value"></a>
 Search is an essential function to derive the value of data.  Redis provides inherent, high-speed search capabilities for JSON and Hash Set data.  
+## Modules Needed <a name="modules"></a>
+```javascript
+import { SchemaFieldTypes } from 'redis';
+```
 
 ## Data Set <a name="dataset"></a>
 ```JSON
