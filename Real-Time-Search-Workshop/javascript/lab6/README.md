@@ -37,40 +37,73 @@ Lab 6 - Deploying a 99.999 Redis Environment
 
 ##### 8. Create an index on each CRDB region
 
-```bash
-FT.CREATE idx1 ON JSON PREFIX 1 product: SCHEMA $.id as id NUMERIC $.gender as gender TAG $.season.* AS season TAG $.description AS description TEXT $.price AS price NUMERIC $.city AS city TEXT $.coords AS coords GEO
+```javascript
+        let result = await client.ft.create('idx1', {
+            '$.id': {
+                type: SchemaFieldTypes.NUMERIC,
+                AS: 'id'
+            },
+            '$.gender': {
+                type: SchemaFieldTypes.TAG,
+                AS: 'gender'
+            }, 
+            '$.season.*': {
+                type: SchemaFieldTypes.TAG,
+                AS: 'season'
+            },
+            '$.description': {
+                type: SchemaFieldTypes.TEXT,
+                AS: 'description'
+            },
+            '$.price': {
+                type: SchemaFieldTypes.NUMERIC,
+                AS: 'price'
+            },
+            '$.city': {
+                type: SchemaFieldTypes.TEXT,
+                AS: 'city'
+            },
+            '$.coords': {
+                type: SchemaFieldTypes.GEO,
+                AS: 'coords'
+            }
+        }, { ON: 'JSON', PREFIX: 'product:'});
 ```
 
 ![alt_text](images/image8.png "image_tooltip")
 
 ##### 9. Add a new JSON document on us-east-1 CRDB region and verify that it was propagated to us-west-2 CRDB region
 
-```bash
-JSON.SET product:15970 $ '{"id": 15970, "gender": "Men", "season":["Fall", "Winter"], "description": "Turtle Check Men Navy Blue Shirt", "price": 34.95, "city": "Boston", "coords": "-71.057083, 42.361145"}'
+```javascript
+await client.json.set('product:15970', '$', {"id": 15970, "gender": "Men", "season":["Fall", "Winter"], "description": "Turtle Check Men Navy Blue Shirt", "price": 34.95, "city": "Boston", "coords": "-71.057083, 42.361145"});
+
 ```
 
 ![alt_text](images/image9.png "image_tooltip")
 
 ##### 10. Search for "shirt" on both CRDB regions and verify that you get results on both regions
 
-```bash
-FT.SEARCH idx1 "shirt"
+```javascript
+result = await client.ft.search('idx1', '@description:shirt');
+console.log(JSON.stringify(result, null, 4));
 ```
 
 ![alt_text](images/image10.png "image_tooltip")
 
 ##### 11. Now add a second JSON document on us-west-2 CRDB region and verify that it was propagated to us-east-1 CRDB region
 
-```bash
-JSON.SET product:59263 $ '{"id": 59263, "gender": "Women", "season":["Fall", "Winter", "Spring", "Summer"],"description": "Titan Women Silver Watch", "price": 129.99, "city": "Dallas", "coords": "-96.808891, 32.779167"}'
+```javascript
+await client.json.set('product:59263', '$', {"id": 59263, "gender": "Women", "season":["Fall", "Winter", "Spring", "Summer"],"description": "Titan Women Silver Watch", "price": 129.99, "city": "Dallas", "coords": "-96.808891, 32.779167"});
+
 ```
 
 ![alt_text](images/image11.png "image_tooltip")
 
 ##### 12. Search for the "Winter" season tag on both CRDB regions and verify that you get two results on both regions
 
-```bash
-FT.SEARCH idx1 '@season:{Winter}'
+```javascript
+result = await client.ft.search('idx1', '@season:{Winter}');
+console.log(JSON.stringify(result, null, 4));
 ```
 
 ![alt_text](images/image12.png "image_tooltip")

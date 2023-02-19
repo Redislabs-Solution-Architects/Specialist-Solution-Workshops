@@ -82,10 +82,12 @@ npm install redis
   "type":"module"
 }
 ```
+### Modules Needed
+```javascript
+import { createClient } from 'redis';
+```
 ### Connect Client
 ```javascript
-import { createClient, SchemaFieldTypes, VectorAlgorithms, AggregateSteps, AggregateGroupByReducers } from 'redis';
-
 const user = 'default';
 const pwd = 'your password';
 const url = 'your cloud url';

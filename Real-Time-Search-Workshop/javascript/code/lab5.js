@@ -7,13 +7,12 @@ import * as mobilenet from '@tensorflow-models/mobilenet';
 import * as tfnode from '@tensorflow/tfjs-node';
 import fsPromises from 'node:fs/promises';
 import * as path  from 'path';
-
-
+const IMAGE_DIR = '../lab5/images';
 
 export class Lab5 {
     
     async #vectorize(fileName) {
-        const image =  await fsPromises.readFile(path.join(process.env.PWD, `lab5/${fileName}`));
+        const image =  await fsPromises.readFile(path.join(process.env.PWD, `${IMAGE_DIR}/${fileName}`));
         const decodedImage = tfnode.node.decodeImage(image, 3);
         const model = await mobilenet.load({version:1, alpha:.5});
         const vector = model.infer(decodedImage, true);
@@ -119,36 +118,12 @@ export class Lab5 {
             '$.city': {
                 type: SchemaFieldTypes.TEXT,
                 AS: 'city'
-            },
-            '$.location': {
-                type: SchemaFieldTypes.GEO,
-                AS: 'location'
-            }, 
-            '$.inventory[*].id': {
-                type: SchemaFieldTypes.NUMERIC,
-                AS: 'id'
-            },
-            '$.inventory[*].gender': {
-                type: SchemaFieldTypes.TAG,
-                AS: 'gender'
-            },
-            '$.inventory[*].season.*': {
-                type: SchemaFieldTypes.TAG,
-                AS: 'season'
-            },
-            '$.inventory[*].description': {
-                type: SchemaFieldTypes.TEXT,
-                AS: 'description'
-            },
-            '$.inventory[*].price': {
-                type: SchemaFieldTypes.NUMERIC,
-                AS: 'price'
             }
         }, { ON: 'JSON', PREFIX: 'warehouse:'});
         console.log(result);
 
         console.log('\n*** Lab 5 - Search w/JSON Filtering - Example 1 ***');
-        result = await client.ft.search('wh_idx', '@season:{Fall}', {
+        result = await client.ft.search('wh_idx', '@city:Boston', {
             RETURN: ['$.inventory[?(@.price>50)].id'],
             DIALECT: 3
         });
