@@ -36,6 +36,8 @@ import fsPromises from 'node:fs/promises';
 import * as path  from 'path';
 ```
 ## Vector Similarity Search (VSS) <a name="vss"></a>
+### Syntax
+[VSS](https://redis.io/docs/stack/search/reference/vectors/)
 
 ### Data Set <a name="vss_dataset"></a>
 - Image 16185: Enroute Men Leather Black Formal Shoes  
@@ -313,7 +315,8 @@ Find all inventory items in Dallas that are for Women or Girls
 
 ## Aggregation <a name="aggr">
 ### Syntax
-See redis.io
+[FT.AGGREGATE](https://redis.io/commands/ft.aggregate/)
+
 ### Data Set <a name="aggr_dataset">
 ```JSON
 {

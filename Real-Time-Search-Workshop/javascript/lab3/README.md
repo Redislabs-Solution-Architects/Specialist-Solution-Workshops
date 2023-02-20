@@ -66,10 +66,9 @@ import { SchemaFieldTypes } from 'redis';
     await client.json.set('product:46885', '$', {"id": 46885, "gender": "Boys", "season":["Fall"], "description": "Ben 10 Boys Navy Blue Slippers", "price": 45.99, "city": "Denver", "coords": "-104.991531, 39.742043"});
 ```
 ## Index Creation <a name="index_creation"></a>
-### Syntax (abbreviated)
-```javascript
-   client.ft.create(idx, {field: {type: SchemaFieldType, AS: name}},... {ON: obtype, PREFIX: pname});
-```
+### Syntax
+[FT.CREATE](https://redis.io/commands/ft.create/)
+
 #### Command
 ```javascript
     let result = await client.ft.create('idx1', {
@@ -110,10 +109,9 @@ OK
 ```
 
 ## Search Examples <a name="search_examples"></a>
-### Syntax (abbreviated)
-```javascript
-client.ft.search(idx, query, {options});
-```
+### Syntax
+[FT.SEARCH](https://redis.io/commands/ft.search/)
+
 ### Retrieve All <a name="retrieve_all"></a>
 Find all documents for a given index.
 #### Command

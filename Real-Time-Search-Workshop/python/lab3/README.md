@@ -69,7 +69,7 @@ from redis.commands.search.query import Query
         client.json().set('product:46885', '$', {"id": 46885, "gender": "Boys", "season":["Fall"], "description": "Ben 10 Boys Navy Blue Slippers", "price": 45.99, "city": "Denver", "coords": "-104.991531, 39.742043"})
 ```
 ## Index Creation <a name="index_creation"></a>
-### Syntax (abbreviated)
+### Syntax
 [FT.CREATE](https://redis.io/commands/ft.create/)
 
 #### Command

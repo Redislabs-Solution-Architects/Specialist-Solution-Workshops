@@ -76,9 +76,7 @@ The ability to query within a JSON object unlocks further value to the underlyin
 ```
 ## Array Filtering Examples <a name="arrayfiltering"></a>
 ### Syntax
-```javascript
-client.json.get(key, {path: "path"})
-```
+[JSON.GET](https://redis.io/commands/json.get/)
 
 ### All Properties of Array <a name="allprops"></a>
 Fetch all properties of an array.
@@ -258,7 +256,6 @@ Fetch all items within an array that meet at least one relational operation.  In
 ```javascript
     result = await client.json.get('warehouse:1', { path: '$.inventory[?(@.price<100||@.gender=="Women")].id' });
     console.log(JSON.stringify(result, null, 4));
-}
 ```
 #### Result
 ```json

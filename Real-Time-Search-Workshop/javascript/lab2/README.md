@@ -33,9 +33,8 @@ Document stores are a NoSQL database type that provide flexible schemas and acce
 
 ## Create <a name="create"></a>
 ### Syntax
-```javascript
-client.json.set(key, path, object)
-```
+[JSON.SET](https://redis.io/commands/json.set/)
+
 ### Key Value Pair <a name="kvp"></a>
 Insert a simple KVP as a JSON object.
 #### Command
@@ -126,9 +125,8 @@ OK
 
 ## Read <a name="read"></a>
 ### Syntax
-```javascript
-client.json.get(key, {path: "path"})
-```
+[JSON.GET](https://redis.io/commands/json.get/)
+
 ### Key Fetch <a name="key_fetch"></a>
 Set and Fetch a simple JSON KVP.
 #### Command
@@ -203,9 +201,8 @@ Fetch properties within an array and utilize array subscripting.
 
 ## Update <a name="update"></a>
 ### Syntax
-```javascript
-client.json.set(key, path, object)
-```
+[JSON.SET](https://redis.io/commands/json.set/)
+
 ### Entire Object <a name="entire_update"></a>
 Update an entire JSON object.
 #### Command
@@ -263,9 +260,8 @@ Update an item in an array via index.
 
 ## Delete <a name="delete"></a>
 ### Syntax
-```javascript
-client.json.del(key, path)
-```
+[JSON.DEL](https://redis.io/commands/json.del/)
+
 ### Entire Object <a name="entire_delete"></a>
 Delete entire object/key.
 #### Command
