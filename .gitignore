@@ -4,3 +4,6 @@ node_modules/
 .venv/
 redis.ini
 __pycache__
+bin/
+obj/
+App.config

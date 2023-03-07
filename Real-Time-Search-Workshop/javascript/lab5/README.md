@@ -8,7 +8,7 @@ Aggregation and other more complex RediSearch queries
     2.  [Data Load](#vss_dataload)
     3.  [Index Creation](#vss_index)
     4.  [Search](#vss_search)
-3.  [Advanced Search Queries](#adv_search)
+4.  [Advanced Search Queries](#adv_search)
     1.  [Data Set](#advs_dataset)
     2.  [Data Load](#advs_dataload)
     3.  [Index Creation](#advs_index)
@@ -351,7 +351,7 @@ await client.json.set('book:4', '$', {"title": "Superintelligence: Path, Dangers
 
 ### Index Creation <a name="aggr_index">
 #### Command
-```bash
+```javascript
     result = await client.ft.create('book_idx', {
         '$.title': {
             type: SchemaFieldTypes.TEXT,
