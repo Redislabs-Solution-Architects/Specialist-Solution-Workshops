@@ -1,8 +1,0 @@
-<configuration>
-    <appSettings>
-        <add key="UserName" value="default" />
-        <add key="Password" value="wmi4buiWodo4Z77Vgp3fdasVO1vdJzDe" />
-        <add key="URL" value="redis-12731.c124.us-central1-1.gce.cloud.redislabs.com" />
-        <add key="Port" value="12731" />
-    </appSettings>
-</configuration>
