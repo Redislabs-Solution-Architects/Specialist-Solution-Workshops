@@ -1,4 +1,4 @@
-# Lab 5 - Advanced Search
+# Lab 5 - Advanced Querying
 Aggregation and other more complex RediSearch queries
 ## Contents
 1.  [Business Value Statement](#value)

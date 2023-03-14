@@ -1,4 +1,4 @@
-# Lab 5 - Advanced Search
+# Lab 5 - Advanced Querying
 Aggregation and other more complex RediSearch queries
 ## Contents
 1.  [Business Value Statement](#value)
@@ -29,7 +29,7 @@ Redis provides the following additional advanced search capabilities to derive f
 
 ## Modules Needed <a name="modules"></a>
 ```python
-from redis.commands.search.field import NumericField, TagField, TextField, VectorField 
+from redis.commands.search.field import NumericField, TagField, TextField, VectorField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 from redis.commands.search.aggregation import AggregateRequest
@@ -68,10 +68,10 @@ images = ['16185.jpg', '4790.jpg', '25628.jpg']
 ### Index Creation <a name="vss_index">
 #### Command
 ```python
-schema = [ VectorField('$.image_vector', 
-        'FLAT', 
-        {   "TYPE": 'FLOAT32', 
-            "DIM": 512, 
+schema = [ VectorField('$.image_vector',
+        'FLAT',
+        {   "TYPE": 'FLOAT32',
+            "DIM": 512,
             "DISTANCE_METRIC": 'L2'
         },  as_name='image_vector'
         ),
@@ -100,7 +100,7 @@ q = Query(q_str)\
     .dialect(2)    
 params_dict = {"query_vec": query_vector}
 results = client.ft('vss_idx').search(q, query_params=params_dict)
-print(results) 
+print(results)
 ```
 #### Result
 ```bash

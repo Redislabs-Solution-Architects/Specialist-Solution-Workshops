@@ -1,5 +1,5 @@
-# Lab 3 - Basic Search Operations
-Examples of simple search operations with RediSearch 
+# Lab 3 - Basic Query Operations
+Examples of simple query operations with RediSearch
 ## Contents
 1.  [Business Value Statement](#value)
 2.  [Modules Needed](#modules)
@@ -67,30 +67,30 @@ using NRedisStack.Search.Literals.Enums;
 ```c#
 IJsonCommands json = db.JSON();
 json.Set("product:15970", "$", new {
-    id = 15970, 
-    gender = "Men", 
-    season = new[] {"Fall", "Winter"}, 
-    description = "Turtle Check Men Navy Blue Shirt", 
-    price = 34.95, 
-    city = "Boston", 
+    id = 15970,
+    gender = "Men",
+    season = new[] {"Fall", "Winter"},
+    description = "Turtle Check Men Navy Blue Shirt",
+    price = 34.95,
+    city = "Boston",
     coords = "-71.057083, 42.361145"
 });
 json.Set("product:59263", "$", new {
-    id = 59263, 
-    gender = "Women", 
+    id = 59263,
+    gender = "Women",
     season = new[] {"Fall", "Winter", "Spring", "Summer"},
-    description = "Titan Women Silver Watch", 
-    price = 129.99, 
-    city = "Dallas", 
+    description = "Titan Women Silver Watch",
+    price = 129.99,
+    city = "Dallas",
     coords = "-96.808891, 32.779167"
 });
 json.Set("product:46885", "$", new {
-    id = 46885, 
-    gender = "Boys", 
-    season = new[] {"Fall"}, 
-    description = "Ben 10 Boys Navy Blue Slippers", 
-    price = 45.99, 
-    city = "Denver", 
+    id = 46885,
+    gender = "Boys",
+    season = new[] {"Fall"},
+    description = "Ben 10 Boys Navy Blue Slippers",
+    price = 45.99,
+    city = "Denver",
     coords = "-104.991531, 39.742043"
 });
 ```
@@ -233,7 +233,7 @@ foreach (var doc in ft.Search("idx1", new Query("-(@description:Shirt)"))
                     .Documents.Select(x => x["json"]))
 {
     Console.WriteLine(doc);
-} 
+}
 ```
 #### Result
 ```json
@@ -273,7 +273,7 @@ foreach (var doc in ft.Search("idx1", new Query("@description:*Watch"))
 ```
 
 ### Fuzzy <a name="fuzzy"></a>
-Find all documents that contain a word that is within 1 Levenshtein distance of a given word. 
+Find all documents that contain a word that is within 1 Levenshtein distance of a given word.
 #### Command
 ```c#
 foreach (var doc in ft.Search("idx1", new Query("@description:%wavy%"))

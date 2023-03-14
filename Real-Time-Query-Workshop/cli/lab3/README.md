@@ -1,5 +1,5 @@
-# Lab 3 - Basic Search Operations
-Examples of simple search operations with RediSearch 
+# Lab 3 - Basic Query Operations
+Examples of simple query operations with RediSearch 
 ## Contents
 1.  [Business Value Statement](#value)
 2.  [Data Set](#dataset)
@@ -238,7 +238,7 @@ FT.SEARCH idx1 '@description:*Watch'
 ```
 
 ### Fuzzy <a name="fuzzy"></a>
-Find all documents that contain a word that is within 1 Levenshtein distance of a given word. 
+Find all documents that contain a word that is within 1 Levenshtein distance of a given word.
 #### Command
 ```bash
 FT.SEARCH idx1 '@description:%wavy%'

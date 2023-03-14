@@ -1,4 +1,4 @@
-# Lab 5 - Advanced Search
+# Lab 5 - Advanced Querying
 Aggregation and other more complex RediSearch queries
 ## Contents
 1.  [Business Value Statement](#value)
@@ -169,7 +169,7 @@ True
 Find all inventory ids from all the Boston warehouse that have a price > $50.
 #### Command
 ```c#
-foreach (var doc in ft.Search("wh_idx", 
+foreach (var doc in ft.Search("wh_idx",
                         new Query("@city:Boston")
                             .ReturnFields(new FieldName("$.inventory[?(@.price>50)].id", "result"))
                             .Dialect(3))
@@ -187,14 +187,14 @@ foreach (var doc in ft.Search("wh_idx",
 Find all inventory items in Dallas that are for Women or Girls
 #### Command
 ```c#
-foreach (var doc in ft.Search("wh_idx", 
+foreach (var doc in ft.Search("wh_idx",
                         new Query("@city:(Dallas)")
                             .ReturnFields(new FieldName("$.inventory[?(@.gender==\"Women\" || @.gender==\"Girls\")]", "result"))
                             .Dialect(3))
                     .Documents.Select(x => x["result"]))
 {
     Console.WriteLine(doc);
-} 
+}
 ```
 #### Result
 ```json

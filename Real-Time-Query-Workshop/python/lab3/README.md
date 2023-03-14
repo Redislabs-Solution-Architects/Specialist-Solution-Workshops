@@ -1,5 +1,5 @@
-# Lab 3 - Basic Search Operations
-Examples of simple search operations with RediSearch 
+# Lab 3 - Basic Query Operations
+Examples of simple query operations with RediSearch
 ## Contents
 1.  [Business Value Statement](#value)
 2.  [Modules Needed](#modules)
@@ -227,7 +227,7 @@ Result{1 total, docs: [Document {'id': 'product:59263', 'payload': None, 'json':
 ```
 
 ### Fuzzy <a name="fuzzy"></a>
-Find all documents that contain a word that is within 1 Levenshtein distance of a given word. 
+Find all documents that contain a word that is within 1 Levenshtein distance of a given word.
 #### Command
 ```python
 query = Query('@description:%wavy%')
