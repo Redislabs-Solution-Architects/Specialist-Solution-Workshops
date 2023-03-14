@@ -1,4 +1,4 @@
-**Real Time Search Workshop**
+**Real Time Query Workshop**
 
 # Lab 1 - Create your Redis Environment
 
@@ -70,24 +70,35 @@ Visit [https://redis.com/try-free/](https://redis.com/try-free/) and sign-up for
 
 ![alt_text](images/image17.png "image_tooltip")
 
-## 17. .NET Setup
-### Packages
+## 17. Node-Redis Setup
+### NPM
 ```bash
-dotnet add package StackExchange.Redis
-dotnet add package NRedisStack
+npm init -y
+npm install redis
+```
+### Edit package.json to enable modules
+```javascript
+  },
+  "type":"module"
+}
+```
+### Modules Needed
+```javascript
+import { createClient } from 'redis';
 ```
 ### Connect Client
-```c#
-ConfigurationOptions options = new ConfigurationOptions
-{
-  EndPoints = {<your URL> + ":" + <your PORT>},
-  Password = <your password>
-};
-ConnectionMultiplexer muxer = ConnectionMultiplexer.Connect(options);
-IDatabase client = muxer.GetDatabase();
-Console.WriteLine($"ping: {client.Ping().TotalMilliseconds} ms");
+```javascript
+const user = 'default';
+const pwd = 'your password';
+const url = 'your cloud url';
+const port = 'your port';
+const client = createClient({url: `redis://${user}:${pwd}@${url}:${port}`});
+
+await client.connect();
+let result = await client.ping();
+console.log(result);
 ```
 ### Result
 ```bash
-ping: 0.5424 ms
+PONG
 ```

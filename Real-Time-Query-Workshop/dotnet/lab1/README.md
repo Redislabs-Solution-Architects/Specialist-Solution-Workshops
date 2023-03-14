@@ -1,4 +1,4 @@
-**Real Time Search Workshop**
+**Real Time Query Workshop**
 
 # Lab 1 - Create your Redis Environment
 
@@ -70,28 +70,24 @@ Visit [https://redis.com/try-free/](https://redis.com/try-free/) and sign-up for
 
 ![alt_text](images/image17.png "image_tooltip")
 
-## 17. Python Setup
-### Virtual Environment
+## 17. .NET Setup
+### Packages
 ```bash
-python3 -m venv .venv
-source ./.venv/bin/activate
-pip install redis
-```
-### Modules Needed
-``` python
-from redis import from_url
+dotnet add package StackExchange.Redis
+dotnet add package NRedisStack
 ```
 ### Connect Client
-```python
-        user = 'your user'
-        pwd = 'your password'
-        url = 'your url'
-        port = 'your port'
-    
-        client = from_url(f'redis://{user}:{pwd}@{url}:{port}')
-        print(client.ping())
+```c#
+ConfigurationOptions options = new ConfigurationOptions
+{
+  EndPoints = {<your URL> + ":" + <your PORT>},
+  Password = <your password>
+};
+ConnectionMultiplexer muxer = ConnectionMultiplexer.Connect(options);
+IDatabase client = muxer.GetDatabase();
+Console.WriteLine($"ping: {client.Ping().TotalMilliseconds} ms");
 ```
 ### Result
 ```bash
-True
+ping: 0.5424 ms
 ```

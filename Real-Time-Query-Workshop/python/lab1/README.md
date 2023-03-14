@@ -1,4 +1,4 @@
-**Real Time Search Workshop**
+**Real Time Query Workshop**
 
 # Lab 1 - Create your Redis Environment
 
@@ -70,35 +70,28 @@ Visit [https://redis.com/try-free/](https://redis.com/try-free/) and sign-up for
 
 ![alt_text](images/image17.png "image_tooltip")
 
-## 17. Node-Redis Setup
-### NPM
+## 17. Python Setup
+### Virtual Environment
 ```bash
-npm init -y
-npm install redis
-```
-### Edit package.json to enable modules
-```javascript
-  },
-  "type":"module"
-}
+python3 -m venv .venv
+source ./.venv/bin/activate
+pip install redis
 ```
 ### Modules Needed
-```javascript
-import { createClient } from 'redis';
+``` python
+from redis import from_url
 ```
 ### Connect Client
-```javascript
-const user = 'default';
-const pwd = 'your password';
-const url = 'your cloud url';
-const port = 'your port';
-const client = createClient({url: `redis://${user}:${pwd}@${url}:${port}`});
-
-await client.connect();
-let result = await client.ping();
-console.log(result);
+```python
+        user = 'your user'
+        pwd = 'your password'
+        url = 'your url'
+        port = 'your port'
+    
+        client = from_url(f'redis://{user}:{pwd}@{url}:{port}')
+        print(client.ping())
 ```
 ### Result
 ```bash
-PONG
+True
 ```
