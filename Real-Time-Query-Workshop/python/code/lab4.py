@@ -1,5 +1,5 @@
 '''
-  @fileoverview Advanced JSON operations with the redis-py client
+  @fileoverview Advanced JSON operations with the redis client
   @maker Joey Whelan
 '''
 from redis.commands.json.path import Path

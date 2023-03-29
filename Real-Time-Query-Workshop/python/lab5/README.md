@@ -4,10 +4,9 @@ Aggregation and other more complex RediSearch queries
 1.  [Business Value Statement](#value)
 2.  [Modules Needed](#modules)
 3.  [Vector Similarity Search](#vss)
-    1.  [Data Set](#vss_dataset)
-    2.  [Data Load](#vss_dataload)
-    3.  [Index Creation](#vss_index)
-    4.  [Search](#vss_search)
+    1.  [Data Load](#vss_dataload)
+    2.  [Index Creation](#vss_index)
+    3.  [Search](#vss_search)
 4.  [Advanced Search Queries](#adv_search)
     1.  [Data Set](#advs_dataset)
     2.  [Data Load](#advs_dataload)
@@ -29,57 +28,32 @@ Redis provides the following additional advanced search capabilities to derive f
 
 ## Modules Needed <a name="modules"></a>
 ```python
-from redis.commands.search.field import NumericField, TagField, TextField, VectorField
+from redis.commands.search.field import NumericField, TagField, TextField, VectorField 
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 from redis.commands.search.aggregation import AggregateRequest
 from redis.commands.search import reducers
-from img2vec_pytorch import Img2Vec
 import numpy as np
-from PIL import Image
-from pathlib import Path
 ```
 
 ## Vector Similarity Search (VSS) <a name="vss"></a>
 ### Syntax
 [VSS](https://redis.io/docs/stack/search/reference/vectors/)
 
-### Data Set <a name="vss_dataset"></a>
-- Image 16185: Enroute Men Leather Black Formal Shoes  
-![shoes](images/16185.jpg)
-- Image 4790: ADIDAS Sky Ball Brown T-shirt  
-![shirt](images/4790.jpg)
-- Image 25628: Fastrack Women Charcoal Grey Dial Watch  
-![watch](images/25628.jpg)
 ### Data Load <a name="vss_dataload"></a>
 ```python
-def vectorize(self, image):
-    img2vec = Img2Vec(cuda=False)       
-    img = Image.open(f'{IMAGE_DIR}/{image}').convert('RGB').resize((224, 224))
-    vector = img2vec.get_vec(img)
-    return vector.tolist()
-
-images = ['16185.jpg', '4790.jpg', '25628.jpg']
-    for image in images:
-        vec = vectorize(image)
-        id = Path(image).stem
-        client.json().set(f'image:{id}', '$', {'image_id': id, 'image_vector': vec})
+        client.json().set('vec:1', '$', {'vector': [1,1,1,1]})
+        client.json().set('vec:2', '$', {'vector': [2,2,2,2]}) 
+        client.json().set('vec:3', '$', {'vector': [3,3,3,3]}) 
+        client.json().set('vec:4', '$', {'vector': [4,4,4,4]}) 
 ```
 ### Index Creation <a name="vss_index">
 #### Command
 ```python
-schema = [ VectorField('$.image_vector',
-        'FLAT',
-        {   "TYPE": 'FLOAT32',
-            "DIM": 512,
-            "DISTANCE_METRIC": 'L2'
-        },  as_name='image_vector'
-        ),
-        TagField('$.image_id', as_name='image_id')
-]
-idx_def: IndexDefinition = IndexDefinition(index_type=IndexType.JSON, prefix=['image:'])
-result = client.ft('vss_idx').create_index(schema, definition=idx_def)
-print(result)
+        schema = [VectorField('$.vector', 'FLAT', { "TYPE": 'FLOAT32', "DIM": 4, "DISTANCE_METRIC": 'L2'},  as_name='vector')]
+        idx_def: IndexDefinition = IndexDefinition(index_type=IndexType.JSON, prefix=['vec:'])
+        result = client.ft('vss_idx').create_index(schema, definition=idx_def)
+        print(result)
 ```
 #### Result
 ```bash
@@ -87,24 +61,21 @@ b'OK'
 ```
 
 ### Search <a name="vss_search">
-#### Query Item
-- Image 35460: Doodle Boys Printed Green T-shirt  
-![shirt](images/35460.jpg)
 #### Command
 ```python
-vec = _vectorize('35460.jpg')
-query_vector = np.array(vec, dtype=np.float32).tobytes()
-q_str = '*=>[KNN 3 @image_vector $query_vec]'
-q = Query(q_str)\
-    .return_fields('__image_vector_score','image_id')\
-    .dialect(2)    
-params_dict = {"query_vec": query_vector}
-results = client.ft('vss_idx').search(q, query_params=params_dict)
-print(results)
+        vec = [2,2,3,3]
+        query_vector = np.array(vec, dtype=np.float32).tobytes()
+        q_str = '*=>[KNN 3 @vector $query_vec]'
+        q = Query(q_str)\
+            .sort_by('__vector_score')\
+            .dialect(2)    
+        params_dict = {"query_vec": query_vector}
+        results = client.ft('vss_idx').search(q, query_params=params_dict)
+        print(results) 
 ```
 #### Result
 ```bash
-Result{3 total, docs: [Document {'id': 'image:4790', 'payload': None, '__image_vector_score': '435.736633301', 'image_id': '4790'}, Document {'id': 'image:16185', 'payload': None, '__image_vector_score': '461.923614502', 'image_id': '16185'}, Document {'id': 'image:25628', 'payload': None, '__image_vector_score': '521.258361816', 'image_id': '25628'}]}
+Result{3 total, docs: [Document {'id': 'vec:2', 'payload': None, '__vector_score': '2', 'json': '{"vector":[2,2,2,2]}'}, Document {'id': 'vec:3', 'payload': None, '__vector_score': '2', 'json': '{"vector":[3,3,3,3]}'}, Document {'id': 'vec:1', 'payload': None, '__vector_score': '10', 'json': '{"vector":[1,1,1,1]}'}]}
 ```
 
 ## Advanced Search Queries <a name="adv_search">

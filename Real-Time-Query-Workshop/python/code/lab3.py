@@ -1,5 +1,5 @@
 '''
-  @fileoverview Basic Search operations with the redis-py client
+  @fileoverview Basic Search operations with the redis client
   @maker Joey Whelan
 '''
 from redis.commands.search.field import NumericField, TagField, TextField, GeoField
@@ -9,11 +9,6 @@ from redis.commands.search.query import Query
 class Lab3(object):
 
     def run(self, client):
-        print('\n*** Lab 3 - Data Loading ***')
-        client.json().set('product:15970', '$', {"id": 15970, "gender": "Men", "season":["Fall", "Winter"], "description": "Turtle Check Men Navy Blue Shirt", "price": 34.95, "city": "Boston", "coords": "-71.057083, 42.361145"})
-        client.json().set('product:59263', '$', {"id": 59263, "gender": "Women", "season":["Fall", "Winter", "Spring", "Summer"],"description": "Titan Women Silver Watch", "price": 129.99, "city": "Dallas", "coords": "-96.808891, 32.779167"})
-        client.json().set('product:46885', '$', {"id": 46885, "gender": "Boys", "season":["Fall"], "description": "Ben 10 Boys Navy Blue Slippers", "price": 45.99, "city": "Denver", "coords": "-104.991531, 39.742043"})
-
         print('\n*** Lab 3 - Index Creation ***')
         try: 
             client.ft('idx1').dropindex()
@@ -32,6 +27,11 @@ class Lab3(object):
         ]
         result = client.ft('idx1').create_index(schema, definition=idx_def)
         print(result)
+        
+        print('\n*** Lab 3 - Data Loading ***')
+        client.json().set('product:15970', '$', {"id": 15970, "gender": "Men", "season":["Fall", "Winter"], "description": "Turtle Check Men Navy Blue Shirt", "price": 34.95, "city": "Boston", "coords": "-71.057083, 42.361145"})
+        client.json().set('product:59263', '$', {"id": 59263, "gender": "Women", "season":["Fall", "Winter", "Spring", "Summer"],"description": "Titan Women Silver Watch", "price": 129.99, "city": "Dallas", "coords": "-96.808891, 32.779167"})
+        client.json().set('product:46885', '$', {"id": 46885, "gender": "Boys", "season":["Fall"], "description": "Ben 10 Boys Navy Blue Slippers", "price": 45.99, "city": "Denver", "coords": "-104.991531, 39.742043"})
 
         print('\n*** Lab 3 - Retrieve All ***')
         query = Query('*')

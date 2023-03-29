@@ -7,57 +7,49 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 from redis.commands.search.aggregation import AggregateRequest
 from redis.commands.search import reducers
-from img2vec_pytorch import Img2Vec
 import numpy as np
-from PIL import Image
-from pathlib import Path
-
-IMAGE_DIR = '../lab5/images'
 
 class Lab5(object):
-    
-    def _vectorize(self, image):
-        img2vec = Img2Vec(cuda=False)       
-        img = Image.open(f'{IMAGE_DIR}/{image}').convert('RGB').resize((224, 224))
-        vector = img2vec.get_vec(img)
-        return vector.tolist()
-    
+
     def run(self, client):
-        print('\n*** Lab 5 - VSS - Data Load ***')
-        images = ['16185.jpg', '4790.jpg', '25628.jpg']
-        for image in images:
-            vec = self._vectorize(image)
-            id = Path(image).stem
-            client.json().set(f'image:{id}', '$', {'image_id': id, 'image_vector': vec})
-        
         print('\n*** Lab 5 - VSS - Index Creation ***')
         try: 
             client.ft('vss_idx').dropindex()
         except:
             pass
-        schema = [ VectorField('$.image_vector', 
-                    'FLAT', 
-                    {   "TYPE": 'FLOAT32', 
-                        "DIM": 512, 
-                        "DISTANCE_METRIC": 'L2'
-                    },  as_name='image_vector'
-                    ),
-                    TagField('$.image_id', as_name='image_id')
-        ]
-        idx_def: IndexDefinition = IndexDefinition(index_type=IndexType.JSON, prefix=['image:'])
+        schema = [VectorField('$.vector', 'FLAT', { "TYPE": 'FLOAT32', "DIM": 4, "DISTANCE_METRIC": 'L2'},  as_name='vector')]
+        idx_def: IndexDefinition = IndexDefinition(index_type=IndexType.JSON, prefix=['vec:'])
         result = client.ft('vss_idx').create_index(schema, definition=idx_def)
         print(result)
-
+        
+        print('\n*** Lab 5 - VSS - Data Load ***')
+        client.json().set('vec:1', '$', {'vector': [1,1,1,1]})
+        client.json().set('vec:2', '$', {'vector': [2,2,2,2]}) 
+        client.json().set('vec:3', '$', {'vector': [3,3,3,3]}) 
+        client.json().set('vec:4', '$', {'vector': [4,4,4,4]}) 
+        
         print('\n*** Lab 5 - VSS - Search ***')
-        vec = self._vectorize('35460.jpg')
+        vec = [2,2,3,3]
         query_vector = np.array(vec, dtype=np.float32).tobytes()
-        q_str = '*=>[KNN 3 @image_vector $query_vec]'
+        q_str = '*=>[KNN 3 @vector $query_vec]'
         q = Query(q_str)\
-            .return_fields('__image_vector_score','image_id')\
+            .sort_by('__vector_score')\
             .dialect(2)    
         params_dict = {"query_vec": query_vector}
         results = client.ft('vss_idx').search(q, query_params=params_dict)
         print(results) 
+
+        print('\n*** Lab 5 - Advanced Search Queries - Index Creation ***')
+        try: 
+            client.ft('wh_idx').dropindex()
+        except:
+            pass
+        idx_def = IndexDefinition(index_type=IndexType.JSON, prefix=['warehouse:'])
+        schema = [
+            TextField('$.city', as_name='city')
+        ]
+        result = client.ft('wh_idx').create_index(schema, definition=idx_def)
+        print(result)
 
         print('\n*** Lab 5 - Advanced Search Queries - Data Load ***')
         client.json().set('warehouse:1', '$', {
@@ -115,18 +107,6 @@ class Lab5(object):
             ]
         })
 
-        print('\n*** Lab 5 - Advanced Search Queries - Index Creation ***')
-        try: 
-            client.ft('wh_idx').dropindex()
-        except:
-            pass
-        idx_def = IndexDefinition(index_type=IndexType.JSON, prefix=['warehouse:'])
-        schema = [
-            TextField('$.city', as_name='city')
-        ]
-        result = client.ft('wh_idx').create_index(schema, definition=idx_def)
-        print(result)
-
         print('\n*** Lab 5 - Search w/JSON Filtering - Example 1 ***')
         query = Query('@city:Boston').return_field('$.inventory[?(@.price>50)].id')
         result = client.ft('wh_idx').search(query)
@@ -138,12 +118,6 @@ class Lab5(object):
             .dialect(3)
         result = client.ft('wh_idx').search(query)
         print(result)
-
-        print('\n*** Lab 5 - Aggregation - Data Load ***')
-        client.json().set('book:1', '$', {"title": "System Design Interview","year": 2020,"price": 35.99})
-        client.json().set('book:2', '$', {"title": "The Age of AI: And Our Human Future","year": 2021,"price": 13.99})
-        client.json().set('book:3', '$', {"title": "The Art of Doing Science and Engineering: Learning to Learn","year": 2020,"price": 20.99})
-        client.json().set('book:4', '$', {"title": "Superintelligence: Path, Dangers, Stategies","year": 2016,"price": 14.36})
 
         print('\n*** Lab 5 - Aggregation - Index Creation ***')
         try: 
@@ -158,6 +132,12 @@ class Lab5(object):
         ]
         result = client.ft('book_idx').create_index(schema, definition=idx_def)
         print(result)
+
+        print('\n*** Lab 5 - Aggregation - Data Load ***')
+        client.json().set('book:1', '$', {"title": "System Design Interview","year": 2020,"price": 35.99})
+        client.json().set('book:2', '$', {"title": "The Age of AI: And Our Human Future","year": 2021,"price": 13.99})
+        client.json().set('book:3', '$', {"title": "The Art of Doing Science and Engineering: Learning to Learn","year": 2020,"price": 20.99})
+        client.json().set('book:4', '$', {"title": "Superintelligence: Path, Dangers, Stategies","year": 2016,"price": 14.36})
 
         print('\n*** Lab 5 - Aggregation - Count ***')
         request = AggregateRequest(f'*').group_by('@year', reducers.count().alias('count'))
