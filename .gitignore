@@ -8,3 +8,6 @@ bin/
 obj/
 App.config
 .vscode/
+target/
+.classpath
+config.properties
