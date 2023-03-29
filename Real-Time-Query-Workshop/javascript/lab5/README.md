@@ -4,10 +4,9 @@ Aggregation and other more complex RediSearch queries
 1.  [Business Value Statement](#value)
 2.  [Modules Needed](#modules)
 3.  [Vector Similarity Search](#vss)
-    1.  [Data Set](#vss_dataset)
-    2.  [Data Load](#vss_dataload)
-    3.  [Index Creation](#vss_index)
-    4.  [Search](#vss_search)
+    1.  [Data Load](#vss_dataload)
+    2.  [Index Creation](#vss_index)
+    3.  [Search](#vss_search)
 4.  [Advanced Search Queries](#adv_search)
     1.  [Data Set](#advs_dataset)
     2.  [Data Load](#advs_dataload)
@@ -30,58 +29,32 @@ Redis provides the following additional advanced search capabilities to derive f
 ## Modules Needed <a name="modules"></a>
 ```javascript
 import { SchemaFieldTypes, VectorAlgorithms, AggregateSteps, AggregateGroupByReducers } from 'redis';
-import * as mobilenet from '@tensorflow-models/mobilenet';
-import * as tfnode from '@tensorflow/tfjs-node';
-import fsPromises from 'node:fs/promises';
-import * as path  from 'path';
 ```
 ## Vector Similarity Search (VSS) <a name="vss"></a>
 ### Syntax
 [VSS](https://redis.io/docs/stack/search/reference/vectors/)
 
-### Data Set <a name="vss_dataset"></a>
-- Image 16185: Enroute Men Leather Black Formal Shoes  
-![shoes](./images/16185.jpg)
-- Image 4790: ADIDAS Sky Ball Brown T-shirt  
-![shirt](./images/4790.jpg)
-- Image 25628: Fastrack Women Charcoal Grey Dial Watch  
-![watch](./images/25628.jpg)
 ### Data Load <a name="vss_dataload"></a>
 ```javascript
-async function vectorize(fileName) {
-    const image =  await fsPromises.readFile(path.join(process.env.PWD, `lab5/${fileName}`));
-    const decodedImage = tfnode.node.decodeImage(image, 3);
-    const model = await mobilenet.load({version:1, alpha:.5});
-    const vector = model.infer(decodedImage, true);
-    return (await vector.array())[0];
-}
-
-    const images = ['16185.jpg', '4790.jpg', '25628.jpg'];
-    for (const image of images) {
-        const vec = await vectorize(image);
-        const id = path.basename(image, '.jpg');
-        await client.json.set(`image:${id}`, '$', {image_id: id, image_vector: vec});
-    }
+        await client.json.set('vec:1', '$', {vector: [1,1,1,1]});
+        await client.json.set('vec:2', '$', {vector: [2,2,2,2]});
+        await client.json.set('vec:3', '$', {vector: [3,3,3,3]});
+        await client.json.set('vec:4', '$', {vector: [4,4,4,4]});
 ```
 ### Index Creation <a name="vss_index">
 #### Command
 ```javascript
-    let idxRes = await client.ft.create('vss_idx', {
-        '$.image_id': {
-            type: SchemaFieldTypes.TAG,
-            AS: 'image_id'
-        },
-        '$.image_vector': {
-            type: SchemaFieldTypes.VECTOR,
-            AS: 'image_vector',
-            ALGORITHM: VectorAlgorithms.FLAT,
-            TYPE: 'FLOAT32',
-            DIM: 512,
-            DISTANCE_METRIC: 'L2'
-        }
-     }, { ON: 'JSON', PREFIX: 'image:'});
-
-    console.log(idxRes);
+        let idxRes = await client.ft.create('vss_idx', {
+            '$.vector': {
+                type: SchemaFieldTypes.VECTOR,
+                AS: 'vector',
+                ALGORITHM: VectorAlgorithms.FLAT,
+                TYPE: 'FLOAT32',
+                DIM: 4,
+                DISTANCE_METRIC: 'L2'
+            }
+        }, { ON: 'JSON', PREFIX: 'vec:'});
+        console.log(idxRes)
 ```
 #### Result
 ```bash
@@ -89,18 +62,14 @@ OK
 ```
 
 ### Search <a name="vss_search">
-#### Query Item
-- Image 35460: Doodle Boys Printed Green T-shirt  
-![shirt](./images/35460.jpg)
 #### Command
 ```javascript
-    let vec = await vectorize('35460.jpg');
-    let result = await client.ft.search('vss_idx', '*=>[KNN 3 @image_vector $query_vec]', {
-        PARAMS: { query_vec: Buffer.from(new Float32Array(vec).buffer) },
-        RETURN: ['__image_vector_score', 'image_id'],
-        DIALECT: 2
-    });
-    console.log(JSON.stringify(result, null, 4));
+        let vec = [2,2,3,3]
+        let result = await client.ft.search('vss_idx', '*=>[KNN 3 @vector $query_vec]', {
+            PARAMS: { query_vec: Buffer.from(new Float32Array(vec).buffer) },
+            DIALECT: 2
+        });
+        console.log(JSON.stringify(result, null, 4));
 ```
 #### Result
 ```json
@@ -108,24 +77,39 @@ OK
     "total": 3,
     "documents": [
         {
-            "id": "image:4790",
+            "id": "vec:1",
             "value": {
-                "__image_vector_score": "426.185058594",
-                "image_id": "4790"
+                "__vector_score": "10",
+                "vector": [
+                    1,
+                    1,
+                    1,
+                    1
+                ]
             }
         },
         {
-            "id": "image:16185",
+            "id": "vec:2",
             "value": {
-                "__image_vector_score": "336.573822021",
-                "image_id": "16185"
+                "__vector_score": "2",
+                "vector": [
+                    2,
+                    2,
+                    2,
+                    2
+                ]
             }
         },
         {
-            "id": "image:25628",
+            "id": "vec:3",
             "value": {
-                "__image_vector_score": "436.19921875",
-                "image_id": "25628"
+                "__vector_score": "2",
+                "vector": [
+                    3,
+                    3,
+                    3,
+                    3
+                ]
             }
         }
     ]

@@ -10,8 +10,6 @@
   "author": "Joey Whelan",
   "license": "See License",
   "dependencies": {
-    "@tensorflow-models/mobilenet": "^2.1.0",
-    "@tensorflow/tfjs-node": "^4.2.0",
     "dotenv": "^16.0.3",
     "redis": "^4.6.4"
   },

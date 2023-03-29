@@ -1,5 +1,5 @@
 /**
- * @fileoverview Basic JSON operations with the node-redis client
+ * @fileoverview Basic JSON operations with the redis client
  * @maker Joey Whelan
  */
 

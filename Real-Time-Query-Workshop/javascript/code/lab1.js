@@ -1,5 +1,5 @@
 /**
- * @fileoverview Creates a node-redis client
+ * @fileoverview Creates a redis client
  * @maker Joey Whelan
  */
 

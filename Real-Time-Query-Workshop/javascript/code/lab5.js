@@ -1,60 +1,49 @@
 /**
- * @fileoverview Advanced Search operations with the node-redis client
+ * @fileoverview Advanced Search operations with the redis client
  * @maker Joey Whelan
  */
 import { SchemaFieldTypes, VectorAlgorithms, AggregateSteps, AggregateGroupByReducers } from 'redis';
-import * as mobilenet from '@tensorflow-models/mobilenet';
-import * as tfnode from '@tensorflow/tfjs-node';
-import fsPromises from 'node:fs/promises';
-import * as path  from 'path';
-const IMAGE_DIR = '../lab5/images';
 
 export class Lab5 {
     
-    async #vectorize(fileName) {
-        const image =  await fsPromises.readFile(path.join(process.env.PWD, `${IMAGE_DIR}/${fileName}`));
-        const decodedImage = tfnode.node.decodeImage(image, 3);
-        const model = await mobilenet.load({version:1, alpha:.5});
-        const vector = model.infer(decodedImage, true);
-        return (await vector.array())[0];
-    }
-
     async run(client) {
-        console.log('\n*** Lab 5 - VSS - Data Load ***');
-        const images = ['16185.jpg', '4790.jpg', '25628.jpg'];
-        for (const image of images) {
-            const vec = await this.#vectorize(image);
-            const id = path.basename(image, '.jpg');
-            await client.json.set(`image:${id}`, '$', {image_id: id, image_vector: vec});
-        }
-
         console.log('\n*** Lab 5 - VSS - Index Creation ***');
         try {await client.ft.dropIndex('vss_idx')} catch(err){};
         let idxRes = await client.ft.create('vss_idx', {
-            '$.image_id': {
-                type: SchemaFieldTypes.TAG,
-                AS: 'image_id'
-            },
-            '$.image_vector': {
+            '$.vector': {
                 type: SchemaFieldTypes.VECTOR,
-                AS: 'image_vector',
+                AS: 'vector',
                 ALGORITHM: VectorAlgorithms.FLAT,
                 TYPE: 'FLOAT32',
-                DIM: 512,
+                DIM: 4,
                 DISTANCE_METRIC: 'L2'
             }
-        }, { ON: 'JSON', PREFIX: 'image:'});
-
+        }, { ON: 'JSON', PREFIX: 'vec:'});
         console.log(idxRes);
 
+        console.log('\n*** Lab 5 - VSS - Data Load ***');
+        await client.json.set('vec:1', '$', {vector: [1,1,1,1]});
+        await client.json.set('vec:2', '$', {vector: [2,2,2,2]});
+        await client.json.set('vec:3', '$', {vector: [3,3,3,3]});
+        await client.json.set('vec:4', '$', {vector: [4,4,4,4]});
+
         console.log('\n*** Lab 5 - VSS - Search ***');
-        let vec = await this.#vectorize('35460.jpg');
-        let result = await client.ft.search('vss_idx', '*=>[KNN 3 @image_vector $query_vec]', {
+        let vec = [2,2,3,3]
+        let result = await client.ft.search('vss_idx', '*=>[KNN 3 @vector $query_vec]', {
             PARAMS: { query_vec: Buffer.from(new Float32Array(vec).buffer) },
-            RETURN: ['__image_vector_score', 'image_id'],
             DIALECT: 2
         });
         console.log(JSON.stringify(result, null, 4));
+
+        console.log('\n*** Lab 5 - Advanced Search Queries - Index Creation ***');
+        try {await client.ft.dropIndex('wh_idx')} catch(err){};
+        result = await client.ft.create('wh_idx', {
+            '$.city': {
+                type: SchemaFieldTypes.TEXT,
+                AS: 'city'
+            }
+        }, { ON: 'JSON', PREFIX: 'warehouse:'});
+        console.log(result);
 
         console.log('\n*** Lab 5 - Advanced Search Queries - Data Load ***');
         await client.json.set('warehouse:1', '$', {
@@ -112,16 +101,6 @@ export class Lab5 {
             ]
         });
 
-        console.log('\n*** Lab 5 - Advanced Search Queries - Index Creation ***');
-        try {await client.ft.dropIndex('wh_idx')} catch(err){};
-        result = await client.ft.create('wh_idx', {
-            '$.city': {
-                type: SchemaFieldTypes.TEXT,
-                AS: 'city'
-            }
-        }, { ON: 'JSON', PREFIX: 'warehouse:'});
-        console.log(result);
-
         console.log('\n*** Lab 5 - Search w/JSON Filtering - Example 1 ***');
         result = await client.ft.search('wh_idx', '@city:Boston', {
             RETURN: ['$.inventory[?(@.price>50)].id'],
@@ -135,12 +114,6 @@ export class Lab5 {
             DIALECT: 3
         });
         console.log(JSON.stringify(result, null, 4));
-
-        console.log('\n*** Lab 5 - Aggregation - Data Load ***');
-        await client.json.set('book:1', '$', {"title": "System Design Interview","year": 2020,"price": 35.99});
-        await client.json.set('book:2', '$', {"title": "The Age of AI: And Our Human Future","year": 2021,"price": 13.99});
-        await client.json.set('book:3', '$', {"title": "The Art of Doing Science and Engineering: Learning to Learn","year": 2020,"price": 20.99});
-        await client.json.set('book:4', '$', {"title": "Superintelligence: Path, Dangers, Stategies","year": 2016,"price": 14.36});
 
         console.log('\n*** Lab 5 - Aggregation - Index Creation ***');
         try {await client.ft.dropIndex('book_idx')} catch(err){};
@@ -159,6 +132,12 @@ export class Lab5 {
         }
         }, { ON: 'JSON', PREFIX: 'book:'});
         console.log(result);
+
+        console.log('\n*** Lab 5 - Aggregation - Data Load ***');
+        await client.json.set('book:1', '$', {"title": "System Design Interview","year": 2020,"price": 35.99});
+        await client.json.set('book:2', '$', {"title": "The Age of AI: And Our Human Future","year": 2021,"price": 13.99});
+        await client.json.set('book:3', '$', {"title": "The Art of Doing Science and Engineering: Learning to Learn","year": 2020,"price": 20.99});
+        await client.json.set('book:4', '$', {"title": "Superintelligence: Path, Dangers, Stategies","year": 2016,"price": 14.36});
 
         console.log('\n*** Lab 5 - Aggregation - Count ***');
         result = await client.ft.aggregate('book_idx', '*', {

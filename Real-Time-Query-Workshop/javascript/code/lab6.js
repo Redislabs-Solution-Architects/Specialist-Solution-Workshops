@@ -1,5 +1,5 @@
 /*
-  @fileoverview AA Search operations with the redis-py client
+  @fileoverview AA Search operations with the redis client
   @maker Joey Whelan
 */
 
