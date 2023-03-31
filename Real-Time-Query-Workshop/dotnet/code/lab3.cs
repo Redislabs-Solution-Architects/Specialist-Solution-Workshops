@@ -1,5 +1,5 @@
 /**
- * @fileoverview Basic Search operations with the node-redis client
+ * @fileoverview Basic Search operations with the redis client
  * @maker Joey Whelan
  */
 using StackExchange.Redis;
@@ -11,9 +11,22 @@ using NRedisStack.Search.Literals.Enums;
 namespace SearchWorkshop 
 {
     public class Lab3 
-    {
+    { 
         public void Run(IDatabase db)
         {
+            Console.WriteLine("\n*** Lab 3 - Index Creation ***");
+            ISearchCommands ft = db.FT();
+            try {ft.DropIndex("idx1");} catch {};
+            ft.Create("idx1",   new FTCreateParams().On(IndexDataType.JSON)
+                                                    .Prefix("product:"),
+                                new Schema().AddNumericField(new FieldName("$.id", "id"))
+                                            .AddTagField(new FieldName("$.gender", "gender"))
+                                            .AddTagField(new FieldName("$.season.*", "season"))
+                                            .AddTextField(new FieldName("$.description", "description"))
+                                            .AddNumericField(new FieldName("$.price", "price"))
+                                            .AddTextField(new FieldName("$.city", "city"))
+                                            .AddGeoField(new FieldName("$.coords", "coords")));
+
             Console.WriteLine("\n*** Lab 3 - Data Loading ***");
             IJsonCommands json = db.JSON();
             json.Set("product:15970", "$", new {
@@ -44,19 +57,6 @@ namespace SearchWorkshop
                 coords = "-104.991531, 39.742043"
             });
 
-            Console.WriteLine("\n*** Lab 3 - Index Creation ***");
-            ISearchCommands ft = db.FT();
-            try {ft.DropIndex("idx1");} catch {};
-            ft.Create("idx1",   new FTCreateParams().On(IndexDataType.JSON)
-                                                    .Prefix("product:"),
-                                new Schema().AddNumericField(new FieldName("$.id", "id"))
-                                            .AddTagField(new FieldName("$.gender", "gender"))
-                                            .AddTagField(new FieldName("$.season.*", "season"))
-                                            .AddTextField(new FieldName("$.description", "description"))
-                                            .AddNumericField(new FieldName("$.price", "price"))
-                                            .AddTextField(new FieldName("$.city", "city"))
-                                            .AddGeoField(new FieldName("$.coords", "coords")));
-        
             Console.WriteLine("\n*** Lab 3 - Retrieve All ***");
             foreach (var doc in ft.Search("idx1", new Query("*")).Documents.Select(x => x["json"]))
             {

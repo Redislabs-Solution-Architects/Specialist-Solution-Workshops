@@ -1,5 +1,5 @@
 /**
- * @fileoverview Advanced Search operations with the node-redis client
+ * @fileoverview Advanced Search operations with the redis client
  * @maker Joey Whelan
  */
 using StackExchange.Redis;
@@ -8,6 +8,7 @@ using NRedisStack.RedisStackCommands;
 using NRedisStack.Search;
 using NRedisStack.Search.Literals.Enums;
 using NRedisStack.Search.Aggregation;
+using static NRedisStack.Search.Schema;
 
 namespace SearchWorkshop 
 {
@@ -16,6 +17,48 @@ namespace SearchWorkshop
     {
         public void Run(IDatabase db) 
         {
+            Console.WriteLine("\n*** Lab 5 - VSS - Index Creation ***");
+            ISearchCommands ft = db.FT();
+            try {ft.DropIndex("vss_idx");} catch {};
+            Console.WriteLine(ft.Create("vss_idx", new FTCreateParams().On(IndexDataType.HASH).Prefix("vec:"),
+                new Schema()
+                .AddVectorField("vector", VectorField.VectorAlgo.FLAT,
+                    new Dictionary<string, object>()
+                    {
+                        ["TYPE"] = "FLOAT32",
+                        ["DIM"] = "4",
+                        ["DISTANCE_METRIC"] = "L2"
+                    }
+            )));
+
+            Console.WriteLine("\n*** Lab 5 - VSS - Data Load ***");
+            db.HashSet("vec:1", "vector", (new float[] {1f,1f,1f,1f}).SelectMany(BitConverter.GetBytes).ToArray());
+            db.HashSet("vec:2", "vector", (new float[] {2f,2f,2f,2f}).SelectMany(BitConverter.GetBytes).ToArray());
+            db.HashSet("vec:3", "vector", (new float[] {3f,3f,3f,3f}).SelectMany(BitConverter.GetBytes).ToArray());
+            db.HashSet("vec:4", "vector", (new float[] {4f,4f,4f,4f}).SelectMany(BitConverter.GetBytes).ToArray());
+
+            Console.WriteLine("\n*** Lab 5 - VSS - Search ***");
+            float[] vec = new[] {2f,2f,3f,3f};
+            var res = ft.Search("vss_idx", 
+                        new Query("*=>[KNN 3 @vector $query_vec]")
+                        .AddParam("query_vec", vec.SelectMany(BitConverter.GetBytes).ToArray())
+                        .SetSortBy("__vector_score")
+                        .Dialect(2));
+            foreach (var doc in res.Documents) {
+                foreach (var item in doc.GetProperties()) {
+                    if (item.Key == "__vector_score") {
+                        Console.WriteLine($"id: {doc.Id}, score: {item.Value}");
+                    }
+                }
+            }       
+ 
+            Console.WriteLine("\n*** Lab 5 - Advanced Search Queries - Index Creation ***");
+            try {ft.DropIndex("wh_idx");} catch {};
+            Console.WriteLine(ft.Create("wh_idx", new FTCreateParams()
+                                    .On(IndexDataType.JSON)
+                                    .Prefix("warehouse:"),
+                                    new Schema().AddTextField(new FieldName("$.city", "city"))));
+       
             Console.WriteLine("\n*** Lab 5 - Advanced Search Queries - Data Load ***");
             IJsonCommands json = db.JSON();
             json.Set("warehouse:1", "$", new {
@@ -73,14 +116,6 @@ namespace SearchWorkshop
                 }
             });
 
-            Console.WriteLine("\n*** Lab 5 - Advanced Search Queries - Index Creation ***");
-            ISearchCommands ft = db.FT();
-            try {ft.DropIndex("wh_idx");} catch {};
-            Console.WriteLine(ft.Create("wh_idx", new FTCreateParams()
-                                    .On(IndexDataType.JSON)
-                                    .Prefix("warehouse:"),
-                                    new Schema().AddTextField(new FieldName("$.city", "city"))));
-       
             Console.WriteLine("\n*** Lab 5 - Search w/JSON Filtering - Example 1 ***"); 
             foreach (var doc in ft.Search("wh_idx", 
                                     new Query("@city:Boston")
@@ -89,7 +124,7 @@ namespace SearchWorkshop
                                 .Documents.Select(x => x["result"]))
             {
                 Console.WriteLine(doc);
-            }   
+            } 
             
             Console.WriteLine("\n*** Lab 5 - Search w/JSON Filtering - Example 2 ***");
             foreach (var doc in ft.Search("wh_idx", 
@@ -100,6 +135,15 @@ namespace SearchWorkshop
             {
                 Console.WriteLine(doc);
             } 
+
+            Console.WriteLine("\n*** Lab 5 - Aggregation - Index Creation ***");
+            try {ft.DropIndex("book_idx");} catch {};
+            Console.WriteLine(ft.Create("book_idx", new FTCreateParams()
+                                    .On(IndexDataType.JSON)
+                                    .Prefix("book:"),
+                                    new Schema().AddTextField(new FieldName("$.title", "title"))
+                                        .AddNumericField(new FieldName("$.year", "year"))
+                                        .AddNumericField(new FieldName("$.price", "price"))));
 
             Console.WriteLine("\n*** Lab 5 - Aggregation - Data Load ***");
             json.Set("book:1", "$", new {
@@ -122,16 +166,6 @@ namespace SearchWorkshop
                 year = 2016,
                 price = 14.36
             });
-
-            Console.WriteLine("\n*** Lab 5 - Aggregation - Index Creation ***");
-            try {ft.DropIndex("book_idx");} catch {};
-            Console.WriteLine(ft.Create("book_idx", new FTCreateParams()
-                                    .On(IndexDataType.JSON)
-                                    .Prefix("book:"),
-                                    new Schema().AddTextField(new FieldName("$.title", "title"))
-                                        .AddNumericField(new FieldName("$.year", "year"))
-                                        .AddNumericField(new FieldName("$.price", "price"))));
-           
 
             Console.WriteLine("\n*** Lab 5 - Aggregation - Count ***");
             var request = new AggregationRequest("*").GroupBy("@year", Reducers.Count().As("count"));

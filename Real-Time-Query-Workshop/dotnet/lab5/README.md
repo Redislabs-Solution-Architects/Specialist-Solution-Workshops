@@ -3,13 +3,17 @@ Aggregation and other more complex RediSearch queries
 ## Contents
 1.  [Business Value Statement](#value)
 2.  [Modules Needed](#modules)
-3.  [Advanced Search Queries](#adv_search)
+3.  [Vector Similarity Search](#vss)
+    1.  [Data Load](#vss_dataload)
+    2.  [Index Creation](#vss_index)
+    3.  [Search](#vss_search)
+4.  [Advanced Search Queries](#adv_search)
     1.  [Data Set](#advs_dataset)
     2.  [Data Load](#advs_dataload)
     3.  [Index Creation](#advs_index)
     4.  [Search w/JSON Filtering - Example 1](#advs_ex1)
     5.  [Search w/JSON Filtering - Example 2](#advs_ex2)
-4.  [Aggregation](#aggr)
+5.  [Aggregation](#aggr)
     1.  [Data Set](#aggr_dataset)
     2.  [Data Load](#aggr_dataload)
     3.  [Index Creation](#aggr_index)
@@ -30,6 +34,61 @@ using NRedisStack.RedisStackCommands;
 using NRedisStack.Search;
 using NRedisStack.Search.Literals.Enums;
 using NRedisStack.Search.Aggregation;
+```
+## Vector Similarity Search (VSS) <a name="vss"></a>
+### Syntax
+[VSS](https://redis.io/docs/stack/search/reference/vectors/)
+
+### Data Load <a name="vss_dataload"></a>
+```c#
+            db.HashSet("vec:1", "vector", (new float[] {1f,1f,1f,1f}).SelectMany(BitConverter.GetBytes).ToArray());
+            db.HashSet("vec:2", "vector", (new float[] {2f,2f,2f,2f}).SelectMany(BitConverter.GetBytes).ToArray());
+            db.HashSet("vec:3", "vector", (new float[] {3f,3f,3f,3f}).SelectMany(BitConverter.GetBytes).ToArray());
+            db.HashSet("vec:4", "vector", (new float[] {4f,4f,4f,4f}).SelectMany(BitConverter.GetBytes).ToArray());
+```
+### Index Creation <a name="vss_index">
+#### Command
+```c#
+            ISearchCommands ft = db.FT();
+            try {ft.DropIndex("vss_idx");} catch {};
+            Console.WriteLine(ft.Create("vss_idx", new FTCreateParams().On(IndexDataType.HASH).Prefix("vec:"),
+                new Schema()
+                .AddVectorField("vector", VectorField.VectorAlgo.FLAT,
+                    new Dictionary<string, object>()
+                    {
+                        ["TYPE"] = "FLOAT32",
+                        ["DIM"] = "4",
+                        ["DISTANCE_METRIC"] = "L2"
+                    }
+            )));
+```
+#### Result
+```bash
+True
+```
+
+### Search <a name="vss_search">
+#### Command
+```c#
+            float[] vec = new[] {2f,2f,3f,3f};
+            var res = ft.Search("vss_idx", 
+                        new Query("*=>[KNN 3 @vector $query_vec]")
+                        .AddParam("query_vec", vec.SelectMany(BitConverter.GetBytes).ToArray())
+                        .SetSortBy("__vector_score")
+                        .Dialect(2));
+            foreach (var doc in res.Documents) {
+                foreach (var item in doc.GetProperties()) {
+                    if (item.Key == "__vector_score") {
+                        Console.WriteLine($"id: {doc.Id}, score: {item.Value}");
+                    }
+                }
+            }   
+```
+#### Result
+```bash
+id: vec:2, score: 2
+id: vec:3, score: 2
+id: vec:1, score: 10
 ```
 
 ## Advanced Search Queries <a name="adv_search">
