@@ -77,18 +77,6 @@ OK
     "total": 3,
     "documents": [
         {
-            "id": "vec:1",
-            "value": {
-                "__vector_score": "10",
-                "vector": [
-                    1,
-                    1,
-                    1,
-                    1
-                ]
-            }
-        },
-        {
             "id": "vec:2",
             "value": {
                 "__vector_score": "2",
@@ -109,6 +97,18 @@ OK
                     3,
                     3,
                     3
+                ]
+            }
+        },
+        {
+            "id": "vec:1",
+            "value": {
+                "__vector_score": "10",
+                "vector": [
+                    1,
+                    1,
+                    1,
+                    1
                 ]
             }
         }

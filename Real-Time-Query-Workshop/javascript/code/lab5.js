@@ -31,7 +31,11 @@ export class Lab5 {
         let vec = [2,2,3,3]
         let result = await client.ft.search('vss_idx', '*=>[KNN 3 @vector $query_vec]', {
             PARAMS: { query_vec: Buffer.from(new Float32Array(vec).buffer) },
-            DIALECT: 2
+            DIALECT: 2,
+            SORTBY: {
+                BY: '__vector_score',
+                DIRECTIION: 'ASC'
+            }
         });
         console.log(JSON.stringify(result, null, 4));
 
