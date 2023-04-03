@@ -3,13 +3,17 @@ Aggregation and other more complex RediSearch queries
 ## Contents
 1.  [Business Value Statement](#value)
 2.  [Modules Needed](#modules)
-3.  [Advanced Search Queries](#adv_search)
+3.  [Vector Similarity Search](#vss)
+    1.  [Data Load](#vss_dataload)
+    2.  [Index Creation](#vss_index)
+    3.  [Search](#vss_search)
+4.  [Advanced Search Queries](#adv_search)
     1.  [Data Set](#advs_dataset)
     2.  [Data Load](#advs_dataload)
     3.  [Index Creation](#advs_index)
     4.  [Search w/JSON Filtering - Example 1](#advs_ex1)
     5.  [Search w/JSON Filtering - Example 2](#advs_ex2)
-4.  [Aggregation](#aggr)
+5.  [Aggregation](#aggr)
     1.  [Data Set](#aggr_dataset)
     2.  [Data Load](#aggr_dataload)
     3.  [Index Creation](#aggr_index)
@@ -25,6 +29,9 @@ Redis provides the following additional advanced search capabilities to derive f
 ## Modules Needed <a name="modules"></a>
 ```java
 import java.util.List;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.HashMap;
 import com.google.gson.Gson;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.search.IndexDefinition;
@@ -37,8 +44,57 @@ import redis.clients.jedis.search.aggr.AggregationResult;
 import redis.clients.jedis.search.aggr.Reducers;
 import redis.clients.jedis.search.aggr.Row;
 import redis.clients.jedis.search.Document;
+import org.json.JSONObject;
+```
+## Vector Similarity Search (VSS) <a name="vss"></a>
+### Syntax
+[VSS](https://redis.io/docs/stack/search/reference/vectors/)
+
+### Data Load <a name="vss_dataload"></a>
+```java
+        client.jsonSet("vec:1", new JSONObject("{\"vector\": [1,1,1,1]}"));
+        client.jsonSet("vec:2", new JSONObject("{\"vector\": [2,2,2,2]}"));
+        client.jsonSet("vec:3", new JSONObject("{\"vector\": [3,3,3,3]}"));
+        client.jsonSet("vec:4", new JSONObject("{\"vector\": [4,4,4,4]}"));
 ```
 
+### Index Creation <a name="vss_index">
+#### Command
+```java
+        HashMap<String, Object> attr = new HashMap<String, Object>();
+        attr.put("TYPE", "FLOAT32");
+        attr.put("DIM", "4");
+        attr.put("DISTANCE_METRIC", "L2");
+        Schema schema = new Schema().addVectorField("$.vector", Schema.VectorField.VectorAlgo.FLAT, attr).as("vector");
+        IndexDefinition rule = new IndexDefinition(IndexDefinition.Type.JSON)
+            .setPrefixes(new String[]{"vec:"});
+        client.ftCreate("vss_idx", IndexOptions.defaultOptions().setDefinition(rule), schema);
+```
+
+### Search <a name="vss_search">
+#### Command
+Note the byte order directive below.  Redis Search is expecting vectors to be expressed in little-endian byte order.
+```java
+        float[] vec = new float[]{2,2,3,3};
+        ByteBuffer buffer = ByteBuffer.allocate(vec.length * Float.BYTES);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.asFloatBuffer().put(vec);
+        Query q = new Query("*=>[KNN 3 @vector $query_vec]")
+                    .addParam("query_vec", buffer.array())
+                    .setSortBy("__vector_score", true)
+                    .dialect(2);
+        SearchResult res = client.ftSearch("vss_idx", q);
+        List<Document> docs = res.getDocuments();
+        for (Document doc : docs) {
+            System.out.println(doc);
+        }
+```
+#### Result
+```bash
+id:vec:2, score: 1.0, payload:null, properties:[$={"vector":[2,2,2,2]}, __vector_score=2]
+id:vec:3, score: 1.0, payload:null, properties:[$={"vector":[3,3,3,3]}, __vector_score=2]
+id:vec:1, score: 1.0, payload:null, properties:[$={"vector":[1,1,1,1]}, __vector_score=10]
+```
 ## Advanced Search Queries <a name="adv_search">
 ### Data Set <a name="advs_dataset">
 ```json

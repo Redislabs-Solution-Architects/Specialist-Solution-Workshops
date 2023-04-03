@@ -4,6 +4,9 @@
  */
 package com.redis.queryworkshop;
 import java.util.List;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.HashMap;
 import com.google.gson.Gson;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.search.IndexDefinition;
@@ -16,6 +19,7 @@ import redis.clients.jedis.search.aggr.AggregationResult;
 import redis.clients.jedis.search.aggr.Reducers;
 import redis.clients.jedis.search.aggr.Row;
 import redis.clients.jedis.search.Document;
+import org.json.JSONObject;
 
     
 public class Lab5 {
@@ -59,11 +63,51 @@ public class Lab5 {
         }
     }
 
+    public byte[] floatToByte(float[] input) {
+        byte[] ret = new byte[input.length*4];
+        for (int x = 0; x < input.length; x++) {
+            ByteBuffer.wrap(ret, x*4, 4).putFloat(input[x]);
+        }
+        return ret;
+    }
+
     public void run(JedisPooled client) {
+        System.out.println("\n*** Lab 5 - VSS - Index Creation ***");
+        try {client.ftDropIndex("vss_idx");} catch(Exception e) {};
+        HashMap<String, Object> attr = new HashMap<String, Object>();
+        attr.put("TYPE", "FLOAT32");
+        attr.put("DIM", "4");
+        attr.put("DISTANCE_METRIC", "L2");
+        Schema schema = new Schema().addVectorField("$.vector", Schema.VectorField.VectorAlgo.FLAT, attr).as("vector");
+        IndexDefinition rule = new IndexDefinition(IndexDefinition.Type.JSON)
+            .setPrefixes(new String[]{"vec:"});
+        client.ftCreate("vss_idx", IndexOptions.defaultOptions().setDefinition(rule), schema);
+
+        System.out.println("\n*** Lab 5 - VSS - Data Load ***");
+        client.jsonSet("vec:1", new JSONObject("{\"vector\": [1,1,1,1]}"));
+        client.jsonSet("vec:2", new JSONObject("{\"vector\": [2,2,2,2]}"));
+        client.jsonSet("vec:3", new JSONObject("{\"vector\": [3,3,3,3]}"));
+        client.jsonSet("vec:4", new JSONObject("{\"vector\": [4,4,4,4]}"));
+       
+        System.out.println("\n*** Lab 5 - VSS - Search ***");
+        float[] vec = new float[]{2,2,3,3};
+        ByteBuffer buffer = ByteBuffer.allocate(vec.length * Float.BYTES);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.asFloatBuffer().put(vec);
+        Query q = new Query("*=>[KNN 3 @vector $query_vec]")
+                    .addParam("query_vec", buffer.array())
+                    .setSortBy("__vector_score", true)
+                    .dialect(2);
+        SearchResult res = client.ftSearch("vss_idx", q);
+        List<Document> docs = res.getDocuments();
+        for (Document doc : docs) {
+            System.out.println(doc);
+        }
+        
         System.out.println("\n*** Lab 5 - Advanced Search Queries - Index Creation ***");
         try {client.ftDropIndex("wh_idx");} catch(Exception e) {};   
-        Schema schema = new Schema().addTextField("$.city",1.0).as("city");
-        IndexDefinition rule = new IndexDefinition(IndexDefinition.Type.JSON)
+        schema = new Schema().addTextField("$.city",1.0).as("city");
+        rule = new IndexDefinition(IndexDefinition.Type.JSON)
             .setPrefixes(new String[]{"warehouse:"});
         client.ftCreate("wh_idx", IndexOptions.defaultOptions().setDefinition(rule), schema);  
 
@@ -90,11 +134,11 @@ public class Lab5 {
         client.jsonSet("warehouse:2", gson.toJson(wh2));  
         
         System.out.println("\n*** Lab 5 - Search w/JSON Filtering - Example 1 ***"); 
-        Query q = new Query("@city:Boston")
+        q = new Query("@city:Boston")
                     .returnFields("$.inventory[?(@.price>50)].id")
                     .dialect(3);
-        SearchResult res = client.ftSearch("wh_idx", q);
-        List<Document> docs = res.getDocuments();
+        res = client.ftSearch("wh_idx", q);
+        docs = res.getDocuments();
         for (Document doc : docs) {
             System.out.println(doc);
         }
