@@ -63,14 +63,6 @@ public class Lab5 {
         }
     }
 
-    public byte[] floatToByte(float[] input) {
-        byte[] ret = new byte[input.length*4];
-        for (int x = 0; x < input.length; x++) {
-            ByteBuffer.wrap(ret, x*4, 4).putFloat(input[x]);
-        }
-        return ret;
-    }
-
     public void run(JedisPooled client) {
         System.out.println("\n*** Lab 5 - VSS - Index Creation ***");
         try {client.ftDropIndex("vss_idx");} catch(Exception e) {};
