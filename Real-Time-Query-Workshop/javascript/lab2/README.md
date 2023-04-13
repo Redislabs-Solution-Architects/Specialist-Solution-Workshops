@@ -65,6 +65,7 @@ Insert a JSON object with multiple properties.
 ```javascript
 result = await client.json.set('ex1:3', '$', {"field1": "val1", "field2": "val2"});
 console.log(result);
+```
 #### Result
 ```bash
 OK
