@@ -72,7 +72,7 @@ True
 ```c#
             float[] vec = new[] {2f,2f,3f,3f};
             var res = ft.Search("vss_idx", 
-                        new Query("*=>[KNN 3 @vector $query_vec]")
+                        new Query("*=>[KNN 2 @vector $query_vec]")
                         .AddParam("query_vec", vec.SelectMany(BitConverter.GetBytes).ToArray())
                         .SetSortBy("__vector_score")
                         .Dialect(2));
@@ -88,7 +88,6 @@ True
 ```bash
 id: vec:2, score: 2
 id: vec:3, score: 2
-id: vec:1, score: 10
 ```
 
 ## Advanced Search Queries <a name="adv_search">

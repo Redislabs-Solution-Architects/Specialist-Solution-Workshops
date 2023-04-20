@@ -40,7 +40,7 @@ namespace SearchWorkshop
             Console.WriteLine("\n*** Lab 5 - VSS - Search ***");
             float[] vec = new[] {2f,2f,3f,3f};
             var res = ft.Search("vss_idx", 
-                        new Query("*=>[KNN 3 @vector $query_vec]")
+                        new Query("*=>[KNN 2 @vector $query_vec]")
                         .AddParam("query_vec", vec.SelectMany(BitConverter.GetBytes).ToArray())
                         .SetSortBy("__vector_score")
                         .Dialect(2));
