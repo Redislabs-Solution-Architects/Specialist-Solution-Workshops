@@ -19,10 +19,11 @@ namespace SearchWorkshop
         {
             Console.WriteLine("\n*** Lab 5 - VSS - Index Creation ***");
             ISearchCommands ft = db.FT();
+            IJsonCommands json = db.JSON();
             try {ft.DropIndex("vss_idx");} catch {};
-            Console.WriteLine(ft.Create("vss_idx", new FTCreateParams().On(IndexDataType.HASH).Prefix("vec:"),
+            Console.WriteLine(ft.Create("vss_idx", new FTCreateParams().On(IndexDataType.JSON).Prefix("vec:"),
                 new Schema()
-                .AddVectorField("vector", VectorField.VectorAlgo.FLAT,
+                .AddVectorField(FieldName.Of("$.vector").As("vector"), VectorField.VectorAlgo.FLAT,
                     new Dictionary<string, object>()
                     {
                         ["TYPE"] = "FLOAT32",
@@ -32,10 +33,10 @@ namespace SearchWorkshop
             )));
 
             Console.WriteLine("\n*** Lab 5 - VSS - Data Load ***");
-            db.HashSet("vec:1", "vector", (new float[] {1f,1f,1f,1f}).SelectMany(BitConverter.GetBytes).ToArray());
-            db.HashSet("vec:2", "vector", (new float[] {2f,2f,2f,2f}).SelectMany(BitConverter.GetBytes).ToArray());
-            db.HashSet("vec:3", "vector", (new float[] {3f,3f,3f,3f}).SelectMany(BitConverter.GetBytes).ToArray());
-            db.HashSet("vec:4", "vector", (new float[] {4f,4f,4f,4f}).SelectMany(BitConverter.GetBytes).ToArray());
+            json.Set("vec:1", "$", "{\"vector\":[1,1,1,1]}");
+            json.Set("vec:2", "$", "{\"vector\":[2,2,2,2]}");
+            json.Set("vec:3", "$", "{\"vector\":[3,3,3,3]}");
+            json.Set("vec:4", "$", "{\"vector\":[4,4,4,4]}");
 
             Console.WriteLine("\n*** Lab 5 - VSS - Search ***");
             float[] vec = new[] {2f,2f,3f,3f};
@@ -60,7 +61,6 @@ namespace SearchWorkshop
                                     new Schema().AddTextField(new FieldName("$.city", "city"))));
        
             Console.WriteLine("\n*** Lab 5 - Advanced Search Queries - Data Load ***");
-            IJsonCommands json = db.JSON();
             json.Set("warehouse:1", "$", new {
                 city = "Boston",
                 location = "-71.057083, 42.361145",
