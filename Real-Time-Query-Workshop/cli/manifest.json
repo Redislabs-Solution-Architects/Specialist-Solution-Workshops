@@ -1,0 +1,72 @@
+{
+  "type": "group",
+  "id": "tutorials",
+  "label": "Specialist-Solution-Workshops",
+  "args": {
+    "withBorder": true,
+    "initialIsOpen": true
+  },
+  "children": [
+    {
+      "type": "group",
+      "id": "redis_stack",
+      "label": "Real-Time Query Workshop",
+      "args": {
+        "initialIsOpen": false
+      },
+      "children": [
+        {
+          "type": "internal-link",
+          "id": "lab1",
+          "label": "Lab1",
+          "args": {
+            "path": "/lab1/README.md"
+          }
+        },{
+          "type": "internal-link",
+          "id": "lab2",
+          "label": "Lab2",
+          "args": {
+            "path": "/lab2/README.md"
+          }
+        },{
+          "type": "internal-link",
+          "id": "lab3",
+          "label": "Lab3",
+          "args": {
+            "path": "/lab3/README.md"
+          }
+        },{
+          "type": "internal-link",
+          "id": "lab4",
+          "label": "Lab4",
+          "args": {
+            "path": "/lab4/README.md"
+          }
+        },{
+          "type": "internal-link",
+          "id": "lab5",
+          "label": "Lab5",
+          "args": {
+            "path": "/lab5/README.md"
+          }
+        },{
+          "type": "internal-link",
+          "id": "lab6-cloud",
+          "label": "Lab6-cloud",
+          "args": {
+            "path": "/lab6-cloud/README.md"
+          }
+        },{
+          "type": "internal-link",
+          "id": "lab6-tf",
+          "label": "Lab6-tf",
+          "args": {
+            "path": "/lab6-tf/README.md"
+          }
+        }
+        
+      ]
+    }
+  ]
+}

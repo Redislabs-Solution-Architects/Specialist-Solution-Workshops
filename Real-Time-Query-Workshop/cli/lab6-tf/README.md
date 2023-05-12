@@ -37,7 +37,7 @@
 
 ## 7. Create an index on each CRDB region
 
-```bash
+```redis command
 FT.CREATE idx1 ON JSON PREFIX 1 product: SCHEMA $.id as id NUMERIC $.gender as gender TAG $.season.* AS season TAG $.description AS description TEXT $.price AS price NUMERIC $.city AS city TEXT $.coords AS coords GEO
 ```
 
@@ -45,7 +45,7 @@ FT.CREATE idx1 ON JSON PREFIX 1 product: SCHEMA $.id as id NUMERIC $.gender as g
 
 ## 8. Add a new JSON document on us-east-1 CRDB region and verify that it was propagated to us-west-2 CRDB region
 
-```bash
+```redis product:15970
 JSON.SET product:15970 $ '{"id": 15970, "gender": "Men", "season":["Fall", "Winter"], "description": "Turtle Check Men Navy Blue Shirt", "price": 34.95, "city": "Boston", "coords": "-71.057083, 42.361145"}'
 ```
 
@@ -53,7 +53,7 @@ JSON.SET product:15970 $ '{"id": 15970, "gender": "Men", "season":["Fall", "Wint
 
 ## 9. Search for "shirt" on both CRDB regions and verify that you get results on both regions
 
-```bash
+```redis command
 FT.SEARCH idx1 "shirt"
 ```
 
@@ -61,7 +61,7 @@ FT.SEARCH idx1 "shirt"
 
 ## 10. Now add a second JSON document on us-west-2 CRDB region and verify that it was propagated to us-east-1 CRDB region
 
-```bash
+```redis product:59263
 JSON.SET product:59263 $ '{"id": 59263, "gender": "Women", "season":["Fall", "Winter", "Spring", "Summer"],"description": "Titan Women Silver Watch", "price": 129.99, "city": "Dallas", "coords": "-96.808891, 32.779167"}'
 ```
 
@@ -69,7 +69,7 @@ JSON.SET product:59263 $ '{"id": 59263, "gender": "Women", "season":["Fall", "Wi
 
 ## 11. Search for the "Winter" season tag on both CRDB regions and verify that you get two results on both regions
 
-```bash
+```redis command
 FT.SEARCH idx1 '@season:{Winter}'
 ```
 
