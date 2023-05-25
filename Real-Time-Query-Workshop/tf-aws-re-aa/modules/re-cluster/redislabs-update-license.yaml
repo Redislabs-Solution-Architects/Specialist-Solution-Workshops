@@ -1,0 +1,6 @@
+---
+- hosts: all[0]
+  serial: 1
+  roles:
+    - print_vers
+    - update_license
