@@ -80,7 +80,7 @@ FT.SEARCH vss_idx "*=>[KNN 3 @vector $query_vec]" PARAMS 2 query_vec "\x00\x00\x
 ```JSON
 {
     "city": "Boston",
-    "location": "42.361145, -71.057083",
+    "location": "-71.057083, 42.361145",
     "inventory": [
         {   
             "id": 15970,
@@ -107,7 +107,7 @@ FT.SEARCH vss_idx "*=>[KNN 3 @vector $query_vec]" PARAMS 2 query_vec "\x00\x00\x
 },
 {
     "city": "Dallas",
-    "location": "32.779167, -96.808891",
+    "location": "-96.808891, 32.779167",
     "inventory": [
         {   
             "id": 51919,

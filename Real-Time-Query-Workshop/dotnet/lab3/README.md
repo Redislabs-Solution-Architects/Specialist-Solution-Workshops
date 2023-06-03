@@ -41,7 +41,7 @@ using NRedisStack.Search.Literals.Enums;
         "description": "Turtle Check Men Navy Blue Shirt",
         "price": 34.95,
         "city": "Boston",
-        "location": "42.361145, -71.057083"
+        "location": "-71.057083, 42.361145"
     },
     {
         "id": 59263,
@@ -50,7 +50,7 @@ using NRedisStack.Search.Literals.Enums;
         "description": "Titan Women Silver Watch",
         "price": 129.99,
         "city": "Dallas",
-        "location": "32.779167, -96.808891"
+        "location": "-96.808891, 32.779167"
     },
     {
         "id": 46885,
@@ -59,7 +59,7 @@ using NRedisStack.Search.Literals.Enums;
         "description": "Ben 10 Boys Navy Blue Slippers",
         "price": 45.99,
         "city": "Denver",
-        "location": "39.742043, -104.991531"
+        "location": "-104.991531, 39.742043"
     }
 ]
 ```
