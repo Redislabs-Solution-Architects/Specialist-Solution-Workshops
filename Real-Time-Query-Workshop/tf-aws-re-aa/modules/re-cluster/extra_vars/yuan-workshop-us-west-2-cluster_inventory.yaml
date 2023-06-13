@@ -1,0 +1,7 @@
+---
+ansible_user: ubuntu
+cluster_name: yuan-workshop-us-west-2-cluster.redisdemo.com
+username: admin@admin.com
+password: admin
+email_from: admin@domain.tld
+smtp_host: smtp.domain.tld

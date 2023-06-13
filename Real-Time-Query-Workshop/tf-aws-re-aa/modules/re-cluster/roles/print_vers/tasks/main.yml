@@ -1,0 +1,4 @@
+---
+- name: Current Redis Labs ansible bundle version
+  ansible.builtin.debug:
+    msg: RL bundle version {{ rl_ansible_vers }}

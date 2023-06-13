@@ -41,19 +41,20 @@ using NRedisStack.Search.Aggregation;
 
 ### Data Load <a name="vss_dataload"></a>
 ```c#
-            db.HashSet("vec:1", "vector", (new float[] {1f,1f,1f,1f}).SelectMany(BitConverter.GetBytes).ToArray());
-            db.HashSet("vec:2", "vector", (new float[] {2f,2f,2f,2f}).SelectMany(BitConverter.GetBytes).ToArray());
-            db.HashSet("vec:3", "vector", (new float[] {3f,3f,3f,3f}).SelectMany(BitConverter.GetBytes).ToArray());
-            db.HashSet("vec:4", "vector", (new float[] {4f,4f,4f,4f}).SelectMany(BitConverter.GetBytes).ToArray());
+            json.Set("vec:1", "$", "{\"vector\":[1,1,1,1]}");
+            json.Set("vec:2", "$", "{\"vector\":[2,2,2,2]}");
+            json.Set("vec:3", "$", "{\"vector\":[3,3,3,3]}");
+            json.Set("vec:4", "$", "{\"vector\":[4,4,4,4]}");
 ```
 ### Index Creation <a name="vss_index">
 #### Command
 ```c#
             ISearchCommands ft = db.FT();
+            IJsonCommands json = db.JSON();
             try {ft.DropIndex("vss_idx");} catch {};
-            Console.WriteLine(ft.Create("vss_idx", new FTCreateParams().On(IndexDataType.HASH).Prefix("vec:"),
+            Console.WriteLine(ft.Create("vss_idx", new FTCreateParams().On(IndexDataType.JSON).Prefix("vec:"),
                 new Schema()
-                .AddVectorField("vector", VectorField.VectorAlgo.FLAT,
+                .AddVectorField(FieldName.Of("$.vector").As("vector"), VectorField.VectorAlgo.FLAT,
                     new Dictionary<string, object>()
                     {
                         ["TYPE"] = "FLOAT32",
@@ -95,7 +96,7 @@ id: vec:3, score: 2
 ```json
 {
     "city": "Boston",
-    "location": "42.361145, -71.057083",
+    "location": "-71.057083, 42.361145",
     "inventory": [
         {   
             "id": 15970,
@@ -122,7 +123,7 @@ id: vec:3, score: 2
 },
 {
     "city": "Dallas",
-    "location": "32.779167, -96.808891",
+    "location": "-96.808891, 32.779167",
     "inventory": [
         {   
             "id": 51919,

@@ -83,7 +83,7 @@ Result{3 total, docs: [Document {'id': 'vec:2', 'payload': None, '__vector_score
 ```json
 {
     "city": "Boston",
-    "location": "42.361145, -71.057083",
+    "location": "-71.057083, 42.361145",
     "inventory": [
         {   
             "id": 15970,
@@ -110,7 +110,7 @@ Result{3 total, docs: [Document {'id': 'vec:2', 'payload': None, '__vector_score
 },
 {
     "city": "Dallas",
-    "location": "32.779167, -96.808891",
+    "location": "-96.808891, 32.779167",
     "inventory": [
         {   
             "id": 51919,
