@@ -11,3 +11,4 @@ App.config
 target/
 .classpath
 config.properties
+.idea/
