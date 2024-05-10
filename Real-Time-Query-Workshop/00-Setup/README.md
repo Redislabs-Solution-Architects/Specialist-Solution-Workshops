@@ -1,3 +1,5 @@
+![Redis](https://redis.io/wp-content/uploads/2024/04/Logotype.svg)
+
 # Redis Workshop Setup
 
 These labs are designed to run either with built-in RedisStack or Redis Cloud.
