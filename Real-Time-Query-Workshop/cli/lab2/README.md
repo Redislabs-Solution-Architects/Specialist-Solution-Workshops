@@ -31,6 +31,8 @@ CRUD (Create, Read, Update, Delete) operations with the Redis JSON data type
 ## Business Value Statement <a name="value"></a>
 Document stores are a NoSQL database type that provide flexible schemas and access patterns that are familiar to developers.  Redis can provide document store functionality natively with its JSON data type.  This allows Redis to complement existing document store databases such as MongoDB or provide standalone JSON document storage.
 
+## Redis Insight CLI
+From Redis Insight, there is a `CLI` tab that opens a shell-like window where you can enter Redis CLI commands. Use this for this lab.
 ## Create <a name="create"></a>
 ### Syntax
 [JSON.SET](https://redis.io/commands/json.set/)

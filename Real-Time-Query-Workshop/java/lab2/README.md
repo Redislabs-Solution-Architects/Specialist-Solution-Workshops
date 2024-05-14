@@ -70,6 +70,7 @@ Insert a JSON object with multiple properties.
         jo.put("field2", "val2");
         res = client.jsonSet("ex1:3", jo);
         System.out.println(res);
+```        
 #### Result
 ```bash
 OK
